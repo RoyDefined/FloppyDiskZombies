@@ -12,7 +12,7 @@ actor GrenadeFireTrigger : Trigger
 	}
 }
 
-actor FireGrenade : ZHWeapon
+actor ZHFireGrenade : ZHWeapon
 {
 	weapon.PreferredSkin "grenade"
 	weapon.SlotNumber	 1

@@ -1,7 +1,7 @@
 actor ShotgunShell : Ammo { Inventory.MaxAmount 8 }
 actor ShotgunPump  : Boolean {}
 
-actor ShotgunSpawn : ZHweaponSpawn 8000
+actor ZHShotgunSpawn : ZHweaponSpawn 8000
 {
 	Inventory.PickupMessage "Hunting shotgun"
 	Tag "Hunting shotgun"
@@ -16,12 +16,12 @@ actor ShotgunSpawn : ZHweaponSpawn 8000
 			TNT1 A 0 A_JumpIf(CallACS("CheckTeamIsHuman", 0, 0, 0) == true, "PickupSuccess")
 			stop
 		PickupSuccess:
-			TNT1 A 0 A_GiveInventory("HuntingShotgun", 1)
+			TNT1 A 0 A_GiveInventory("ZHHuntingShotgun", 1)
 			stop
 	}
 }
 
-actor HuntingShotgun : ZHWeapon
+actor ZHHuntingShotgun : ZHWeapon
 {
 	Tag "Hunting shotgun"
 	Weapon.SlotNumber 3

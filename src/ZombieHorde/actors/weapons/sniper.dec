@@ -10,7 +10,7 @@ actor IsZoomed : Boolean {}
 // This is also used to indicate that the sniper is zoomed between reloads
 actor SniperZoomlevel : inventory { inventory.MaxAmount 2 }
 
-actor SniperSpawn : ZHweaponSpawn 8001
+actor ZHSniperSpawn : ZHweaponSpawn 8001
 {
 	inventory.PickupMessage "Sniper rifle"
 	tag "Sniper rifle"
@@ -30,7 +30,7 @@ actor SniperSpawn : ZHweaponSpawn 8001
 	}
 }
 
-actor SniperRifle : ZHWeapon
+actor ZHSniperRifle : ZHWeapon
 {
 	tag "Sniper rifle"
 	weapon.SlotNumber 5

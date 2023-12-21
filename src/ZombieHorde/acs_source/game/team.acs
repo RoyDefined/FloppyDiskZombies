@@ -117,8 +117,8 @@ script "ScriptPlayerCount"(void) { SetResultValue(PlayerCount()); }
 
 function void GiveHumanWeapons(void)
 {
-	GiveInventory("HuntingShotgun", 1);
-	GiveInventory("SniperRifle", 1);
+	GiveInventory("ZHHuntingShotgun", 1);
+	GiveInventory("ZHSniperRifle", 1);
 	GiveInventory("ZHChaingun", 1);
 }
 

@@ -38,7 +38,7 @@ actor ZHGrenadeSpawn : ZHweaponSpawn
 		Pickup:
 			TNT1 A 0 A_JumpIf(CallACS("CheckTeamIsHuman", 0, 0, 0) == true, 1)
 			stop
-			TNT1 A 0 A_GiveInventory("FireGrenade", 1)
+			TNT1 A 0 A_GiveInventory("ZHFireGrenade", 1)
 			stop
 	}
 }

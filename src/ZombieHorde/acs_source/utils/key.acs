@@ -1,9 +1,0 @@
-function bool IsMoving (void)
-{
-	return KeyDownAny(BT_FORWARD | BT_BACK | BT_MOVELEFT | BT_MOVERIGHT);
-}
-
-function bool PlayerIsMoving (int id)
-{
-	return PlayerKeyDownAny(id, BT_FORWARD | BT_BACK | BT_MOVELEFT | BT_MOVERIGHT);
-}

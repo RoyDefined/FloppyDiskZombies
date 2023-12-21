@@ -1,3 +1,5 @@
+// ACSUtils
+server bool acsutils_noerrors = false;
 
 // If true, the list of provided debug functions are enabled.
 server noarchive /*cheat*/ bool sv_zh_debugfunctions = false;

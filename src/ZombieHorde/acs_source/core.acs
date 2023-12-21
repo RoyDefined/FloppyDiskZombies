@@ -1,16 +1,13 @@
 #library "core"
 #nocompact
 
+#import "acsutils.acs"
+#import "log.acs"
+
 #include "zcommon.acs"
 
-#include "utils/acsutils.acs"
-#include "utils/key.acs"
 #include "utils/wordiscolored.acs"
-#include "utils/math.acs"
-#include "utils/player.acs"
-#include "utils/string.acs"
 #include "utils/formattics.acs"
-#include "utils/log.acs"
 #include "utils/advancedteleport.acs"
 
 #include "common/common.acs"

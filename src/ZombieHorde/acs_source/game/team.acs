@@ -317,7 +317,7 @@ function void SelectInitials(void)
 	int zombiesChosen;
 	while (zombiesChosen < zombieChooseCount)
 	{
-		int id = RandomIngamePlayerId();
+		int id = PickRandomPlayer();
 		if (PlayerTeamIsZombie(id)) {
 			continue;
 		}

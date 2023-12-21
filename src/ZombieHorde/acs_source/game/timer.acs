@@ -107,7 +107,7 @@ function void DrawTime(void)
 		str sound = timeSecond == 0 ? "timer/end" : "timer/one";
 		AmbientSound(sound, 100);
 		
-		HudMessageBold(s:"0:", s:AddLeadingZero(timeSecond, 2); HUDMSG_FADEOUT, HUDID_BOTTOM - 1, CR_RED, 240.0, 340.0, 0.1, 0.5);
+		HudMessageBold(s:"0:", s:LeftPad(StrParam(d:timeSecond), '0', 2); HUDMSG_FADEOUT, HUDID_BOTTOM - 1, CR_RED, 240.0, 340.0, 0.1, 0.5);
 	}
 	else
 	{

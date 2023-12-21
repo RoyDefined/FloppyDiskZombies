@@ -7,7 +7,7 @@ function bool CanUseDebug(void)
 {
 	// Debug is allowed when in singleplayer, or when `sv_zh_debugfunctions` is enabled, or when `sv_cheats` is enabled..
 	if (IsMultiplayer() && !GetCvar("sv_zh_debugfunctions") && !GetCvar("sv_cheats")) {
-		LogMessageClient("This operation either requires: a singleplayer game, `sv_zh_debugfunctions` to be set to true or `sv_cheats` to be set to true.", PlayerNumber());
+		LogTo("This operation either requires: a singleplayer game, `sv_zh_debugfunctions` to be set to true or `sv_cheats` to be set to true.", PlayerNumber());
 		return false;
 	}
 	return true;

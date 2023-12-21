@@ -63,7 +63,7 @@ function void LogMessageToHumans(str message)
 			continue;
 		}
 		
-		LogMessageClient(message, i);
+		LogTo(message, i);
 	}
 }
 
@@ -76,7 +76,7 @@ function void LogMessageToZombies(str message)
 			continue;
 		}
 		
-		LogMessageClient(message, i);
+		LogTo(message, i);
 	}
 }
 
@@ -268,7 +268,7 @@ function void Cure(int curedId)
 	
 	// TODO: Verify the human is properly cured. Maybe health must be set.
 	str curedName = PlayerName(curedId);
-	LogMessage(StrParam(s:"\cf", s:curedName, s:"\cj has miraculously been cured!"));
+	LogBold(StrParam(s:"\cf", s:curedName, s:"\cj has miraculously been cured!"));
 	SetHuman(curedId);
 }
 
@@ -281,7 +281,7 @@ function void Infect(int infector, int infected)
 	
 	str infectedName = PlayerName(infected);
 	str infectorName = PlayerName(infector);
-	LogMessage(StrParam(s:"\cf", s:infectedName, s:"\cj has been infected by \cf", s:infectorName, s:"\cj!"));
+	LogBold(StrParam(s:"\cf", s:infectedName, s:"\cj has been infected by \cf", s:infectorName, s:"\cj!"));
 	SetZombie(infected);
 	
 	if(!SetActivatorToPlayer(infected)) {

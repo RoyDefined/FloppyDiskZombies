@@ -37,6 +37,16 @@ weapons/grenade/PINOUT "sounds/weapons/grenade/pinout.wav"
 weapons/grenade/REPIN "sounds/weapons/grenade/repin.wav"
 weapons/grenade/THROW "sounds/weapons/grenade/throw.wav"
 
+// chaingun
+weapons/chaingun/DEPLOY "sounds/weapons/chaingun/deploy.wav"
+weapons/chaingun/DESELECT "sounds/weapons/chaingun/deselect.wav"
+weapons/chaingun/FIRE "sounds/weapons/chaingun/fire.wav"
+weapons/chaingun/TURN "sounds/weapons/chaingun/turn.wav"
+weapons/chaingun/WARNING "sounds/weapons/chaingun/warning.wav"
+weapons/chaingun/WINDDOWN "sounds/weapons/chaingun/winddown.wav"
+weapons/chaingun/WINDLOOP "sounds/weapons/chaingun/windloop.wav"
+weapons/chaingun/WINDUP "sounds/weapons/chaingun/windup.wav"
+
 // zombie
 player/ZOMBIEDIE "sounds/player/zombiedie.wav"
 player/ZOMBIEHIT "sounds/player/zombiehit.wav"

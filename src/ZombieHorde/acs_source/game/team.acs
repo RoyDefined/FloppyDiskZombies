@@ -116,6 +116,7 @@ function void GiveHumanWeapons(void)
 {
 	GiveInventory("HuntingShotgun", 1);
 	GiveInventory("SniperRifle", 1);
+	GiveInventory("ZHChaingun", 1);
 }
 
 // Fully reset settings on the activator

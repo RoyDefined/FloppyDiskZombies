@@ -112,6 +112,9 @@ function int ZombieCount(void)
 	return count;
 }
 
+// A script variant of `PlayerCount()` for decorate use.
+script "ScriptPlayerCount"(void) { SetResultValue(PlayerCount()); }
+
 function void GiveHumanWeapons(void)
 {
 	GiveInventory("HuntingShotgun", 1);

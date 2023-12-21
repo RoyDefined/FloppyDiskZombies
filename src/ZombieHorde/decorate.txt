@@ -1,0 +1,72 @@
+actor Trigger : CustomInventory
+{
+    inventory.MaxAmount 1
+	
+	//+inventory.AutoActivate
+	+inventory.AlwaysPickup
+	+inventory.Quiet
+	+inventory.Undroppable
+	-inventory.Invbar
+}
+
+actor Boolean : inventory
+{
+    inventory.MaxAmount 1
+	
+	+inventory.Undroppable
+	-inventory.Invbar
+}
+
+actor ZHDebugAsset : CustomInventory
+{
+	//$Category "Zombie Horde Debug"
+	//$NotAngled
+}
+
+actor ZHweaponSpawn : CustomInventory
+{
+	//$Category "Zombie Horde Debug/Weapons"
+	//$NotAngled
+}
+
+actor ZHweapon : Weapon
+{
+	+NOALERT
+	+NOAUTOAIM
+	
+	weapon.BobSpeed 1.6
+	weapon.BobRangeX 0.4
+	weapon.BobRangeY 0.6
+	weapon.BobStyle Alpha
+}
+
+actor BurningDamage : inventory
+{
+	// 30 seconds
+    inventory.MaxAmount 1050
+	
+	+inventory.Quiet
+	+inventory.Undroppable
+	-inventory.Invbar
+}
+
+actor PlayerSpeedModifier : PowerSpeed
+{
+	+PowerSpeed.NoTrail
+	
+	Powerup.Duration 0x7FFFFFFD
+	Speed 0.8
+}
+
+
+#include "actors/debug/player/zombie.dec"
+
+#include "actors/player/zombie.dec"
+#include "actors/player/effects.dec"
+
+#include "actors/weapons/effects.dec"
+#include "actors/weapons/claws.dec"
+#include "actors/weapons/shotgun.dec"
+#include "actors/weapons/sniper.dec"
+#include "actors/weapons/grenade.dec"
+#include "actors/weapons/grenadeeffects.dec"

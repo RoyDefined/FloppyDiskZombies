@@ -1,0 +1,22 @@
+fire1 fire1
+
+POWERSTP	POWERSTP
+
+train train
+$ambient 10 train point continuous 0.3
+
+GENERATE GENERATE
+$AMBIENT 17 GENERATE POINT 1 CONTINUOUS 10.0
+
+humloop humloop
+$AMBIENT 23 humloop POINT 4 CONTINUOUS 100
+
+decoration/TOILETBREAK "sounds/decoration/toiletbreak.wav"
+decoration/waterfall "sounds/decoration/waterfall.ogg"
+
+// glass
+decoration/glass/BREAK1 "sounds/decoration/glass/break1.wav"
+decoration/glass/BREAK2 "sounds/decoration/glass/break2.wav"
+decoration/glass/BREAK3 "sounds/decoration/glass/break3.wav"
+decoration/glass/BREAK4 "sounds/decoration/glass/break4.wav"
+$random decoration/glass/BREAK { decoration/glass/BREAK1 decoration/glass/BREAK2 decoration/glass/BREAK3 decoration/glass/BREAK4 } 

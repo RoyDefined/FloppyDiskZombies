@@ -1,0 +1,31 @@
+actor Lightbulb : SwitchableDecoration 20579
+{
+	//$Category "Light sources"
+	//$NotAngled
+	tag "Light Bulb"
+	scale .75
+	height 17
+	radius 4
+	health 1
+	
+	+SOLID
+	+NOBLOOD
+	+SHOOTABLE
+	+NOGRAVITY
+	+SPAWNCEILING
+	+FORCEYBILLBOARD
+	
+	States
+	{
+        Active:
+        Spawn:
+            BULB A -1 BRIGHT NoDelay Light("BulbLight")
+           
+        Inactive:
+            BULB B -1
+           
+        Death:
+			TNT1 A 0 A_PlaySound("decoration/glass/BREAK")
+            BULB B -1
+	}
+}

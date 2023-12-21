@@ -1,0 +1,38 @@
+actor CeilingLamp : SwitchableDecoration 20578
+{
+	//$Category "Light sources"
+	//$NotAngled
+	tag "Ceiling Lamp"
+	scale .75
+	height 25
+	radius 16
+	//mass 0x7FFFFFFF
+	health 1
+	
+	+SOLID
+	+NOBLOOD
+	+SHOOTABLE
+	+NOGRAVITY
+	+SPAWNCEILING
+	+FORCEYBILLBOARD
+	
+	States
+	{
+		// Failsafe when activated multiple times.
+        // Multiple flares will spawn.
+        Active:
+        Spawn:
+            LAMP A -1 BRIGHT NoDelay Light("CeilingLight")
+           
+        Inactive:
+            LAMP B -1
+           
+        Death:
+			TNT1 A 0 A_PlaySound("decoration/glass/BREAK")
+            LAMP B -1
+			
+		disco:
+            TNT1 A 5 A_SpawnItem("Discolamp")
+            Stop
+	}
+}

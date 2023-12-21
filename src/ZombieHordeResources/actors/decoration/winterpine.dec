@@ -1,0 +1,43 @@
+actor WinterpineSpawner : TreeSpawner 20025
+{
+	//$Sprite PINEA0
+	scale .75
+	tag "Winter pine"
+	DropItem "WinterpineHuge" 255, 1
+	DropItem "WinterpineBig" 255, 1
+	DropItem "WinterpineMedium" 255, 1
+	DropItem "WinterpineSmall" 255, 1
+}
+
+actor WinterpineHuge : Tree
+{
+	scale 1.1
+	Height 280
+	Radius 10
+	States
+	{
+		Spawn:
+			PINE A -1
+	}
+}
+
+actor WinterpineBig : WinterpineHuge
+{
+	scale .9
+	Height 230
+	Radius 9
+}
+
+actor WinterpineMedium : WinterpineHuge
+{
+	scale .7
+	Height 180
+	Radius 9
+}
+
+actor WinterpineSmall : WinterpineHuge
+{
+	scale .5
+	Height 130
+	Radius 8
+}

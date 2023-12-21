@@ -1,0 +1,115 @@
+
+// This file will only contain relevant scripts and functions when the project is compiled with `dev` defined.
+#ifdef dev
+
+function bool CanUseDebug(void)
+{
+	// Debug is allowed when in singleplayer, or when `sv_zh_debugfunctions` is enabled, or when `sv_cheats` is enabled..
+	if (IsMultiplayer() && !GetCvar("sv_zh_debugfunctions") && !GetCvar("sv_cheats")) {
+		LogMessageClient("This operation either requires: a singleplayer game, `sv_zh_debugfunctions` to be set to true or `sv_cheats` to be set to true.", PlayerNumber());
+		return false;
+	}
+	return true;
+}
+
+script "Dbg_SetSelfHuman"(void) net
+{
+	if (!CanUseDebug()) {
+		terminate;
+	}
+	
+	LogInfo(StrParam(s:PlayerName(PlayerNumber()), s:" invoked 'Dbg_SetSelfHuman'."));
+	SetHuman(PlayerNumber());
+}
+
+script "Dbg_SetSelfZombie"(void) net
+{
+	if (!CanUseDebug()) {
+		terminate;
+	}
+	
+	LogInfo(StrParam(s:PlayerName(PlayerNumber()), s:" invoked 'Dbg_SetSelfZombie'."));
+	SetZombie(PlayerNumber());
+}
+
+script "Dbg_CureSelf"(void) net
+{
+	if (!CanUseDebug()) {
+		terminate;
+	}
+	
+	LogInfo(StrParam(s:PlayerName(PlayerNumber()), s:" invoked 'Dbg_CureSelf'."));
+	Cure(PlayerNumber());
+}
+
+script "Dbg_InfectSelf"(void) net
+{
+	if (!CanUseDebug()) {
+		terminate;
+	}
+	
+	LogInfo(StrParam(s:PlayerName(PlayerNumber()), s:" invoked 'Dbg_InfectSelf'."));
+	Infect(PlayerNumber(), PlayerNumber());
+}
+
+script "Dbg_AddCountdown"(void) net
+{
+	if (!CanUseDebug()) {
+		terminate;
+	}
+	
+	LogInfo(StrParam(s:PlayerName(PlayerNumber()), s:" invoked 'Dbg_AddCountdown'."));
+	AddCountdownTimer(10);
+}
+
+script "Dbg_AddPlayTime"(void) net
+{
+	if (!CanUseDebug()) {
+		terminate;
+	}
+	
+	LogInfo(StrParam(s:PlayerName(PlayerNumber()), s:" invoked 'Dbg_AddPlayTime'."));
+	AddPlayingTimer(10);
+}
+
+script "Dbg_AddEndTime"(void) net
+{
+	if (!CanUseDebug()) {
+		terminate;
+	}
+	
+	LogInfo(StrParam(s:PlayerName(PlayerNumber()), s:" invoked 'Dbg_AddEndTime'."));
+	AddEndingTimer(10);
+}
+
+script "Dbg_PauseTimer"(void) net
+{
+	if (!CanUseDebug()) {
+		terminate;
+	}
+	
+	LogInfo(StrParam(s:PlayerName(PlayerNumber()), s:" invoked 'Dbg_PauseTimer'."));
+	PauseTimer();
+}
+
+script "Dbg_ResumeTimer"(void) net
+{
+	if (!CanUseDebug()) {
+		terminate;
+	}
+	
+	LogInfo(StrParam(s:PlayerName(PlayerNumber()), s:" invoked 'Dbg_ResumeTimer'."));
+	ResumeTimer();
+}
+
+script "Dbg_KillUnsafePlayers"(void) net
+{
+	if (!CanUseDebug()) {
+		terminate;
+	}
+	
+	LogInfo(StrParam(s:PlayerName(PlayerNumber()), s:" invoked 'Dbg_KillUnsafePlayers'."));
+	KillUnsafePlayers();
+}
+
+#else

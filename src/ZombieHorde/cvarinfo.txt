@@ -1,0 +1,7 @@
+
+// If true, the list of provided debug functions are enabled.
+server noarchive /*cheat*/ bool sv_zh_debugfunctions = false;
+
+// If true, log debug messages to the console.
+// The same as the build-in `developer` cvar, but strict to ZH messages.
+user bool cl_zh_developer = false;

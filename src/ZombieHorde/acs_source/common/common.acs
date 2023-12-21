@@ -1,0 +1,63 @@
+enum GameState { none, countdown, playing, ending };
+enum PlayerType { none, human, zombie };
+
+struct Player
+{
+	// The player's current specie type.
+	PlayerType type;
+	
+	// If true, the player is considered to be safe from game ending functions targeting unsafe players.
+	bool safe;
+};
+
+struct Game
+{
+	// Every player gets a unique TID.
+	// This integer determines what the base is for each player.
+	int playerTidBase;
+	
+	// When defined, chosen initial zombies will be teleported to a random
+	// teleport spot defined with an id base defined here, plus their zombie index.
+	int initialZombieSpawnId;
+	
+	// The current game state.
+	GameState state;
+	
+	// The various timers of the current game.
+	int countdownTime,
+		playTime,
+		endingTime;
+		
+	// The in game players.
+	Player players[MAX_PLAYERS];
+	
+	// If `true`, the timer has been paused and
+	// events leading up to the timer reaching 0 will not occur.
+	// If the timer is 0, then the next state will trigger.
+	// Regular events (no more humans/zombies) can still happen.
+	// The timer is still visible.
+	bool timerPaused;
+	
+	// Health values to assign to zombies upon infection.
+	int initialZombieHealth,
+		secondaryZombieHealth;
+	
+	// If either of these are `true`, the timer has been disabled for that state and
+	// events leading up to the timer reaching 0 will not occur.
+	// If the timer is 0, it will be ignored.
+	// Regular events (no more humans/zombies) can still happen.
+	// The timer will be completely invisible with this state.
+	bool playTimerDisabled,
+		endTimerDisabled;
+};
+
+// The game's context. This will store relevant information about the running game.
+// This somewhat hacky workaround allows the ability to nest arrays in the context,
+// which is otherwise not possible.
+#define gameContext (gameContextArray[0])
+Game gameContextArray[1];
+
+function bool IsPlaying(void)
+{
+	return gameContext.state != none;
+}

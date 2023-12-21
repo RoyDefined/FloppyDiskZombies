@@ -1,0 +1,48 @@
+actor DebugZombieIdle : ZHDebugAsset 8050
+{
+	Monster
+	PainChance 256
+	Health 500
+	Radius 16
+	Height 56
+	Mass 300
+	
+	States
+	{
+		Spawn:
+			INCA A 1
+			Wait
+			
+		Pain:
+			INCA L 20
+			Goto Spawn
+		
+		Death:
+			INCA M 8
+			INCA N 7
+			INCA O 6
+			INCA PQ 5
+			TNT1 A 0 A_NoBlocking
+			INCA Q -1
+	}
+}
+
+actor DebugZombieWalking : DebugZombieIdle 8051
+{
+	States
+	{
+		Spawn:
+			INCA ABCDEF 5
+			Loop
+	}
+}
+
+actor DebugZombieMelee : DebugZombieIdle 8052
+{
+	States
+	{
+		Spawn:
+			INCA GHIRST 5
+			Loop
+	}
+}

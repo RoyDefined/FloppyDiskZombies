@@ -1,0 +1,63 @@
+function void AssignPlayerTID(void)
+{
+	LogDebug(StrParam(s:"Assigning TID ", d:PlayerNumber() + gameContext.playerTidBase, s:" to ", s:PlayerName(PlayerNumber()), s:" (", d:PlayerNumber(), s:")."));
+	Thing_ChangeTID(0, PlayerNumber() + gameContext.playerTidBase);
+}
+
+function bool IsValidPlayerTID(int tid)
+{
+	int id = tid - gameContext.playerTidBase;
+	return id >= 0 && id < MAX_PLAYERS;
+}
+
+function void SetBasePlayerTID(int tid)
+{
+	// Altering player TID must happen before the gamemode starts.
+	if (!GameStateIsNone()) {
+		LogWarning("Changing the base player TID must happen before the gamemode starts.");
+		terminate;
+	}
+	
+	gameContext.playerTidBase = tid;
+	LogDebug("Reassigning TIDs");
+	
+	// Change for all players.
+	for (int i = 0; i < MAX_PLAYERS; ++i)
+	{
+		if (!PlayerInGame(i)) {
+			continue;
+		}
+		
+		if(!SetActivatorToPlayer(i)) {
+			LogError(StrParam(s:"Unable to change TID for player ", d:i, s:": could not assign as activator."));
+			continue;
+		}
+		
+		AssignPlayerTID();
+	}
+}
+
+function int GetPlayerTIDById(int id)
+{
+	if (id == -1) {
+		LogWarning("Unable to get TID: activated as server.");
+		return -1;
+	}
+	
+	return id + gameContext.playerTidBase;
+}
+
+function int GetPlayerIDByTID(int tid)
+{
+	if (!IsValidPlayerTID(tid)) {
+		LogWarning(StrParam(s:"Unable to get id from TID: ", d:tid, s:" is not a valid tid."));
+		return -1;
+	}
+	
+	return tid - gameContext.playerTidBase;
+}
+
+function int GetPlayerTID(void)
+{
+	return GetPlayerTIDById(PlayerNumber());
+}

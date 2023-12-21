@@ -1,0 +1,12 @@
+
+// TODO: This also exists in ACSUtils
+function int RandomIngamePlayerId(void)
+{
+	int playerId = random(0, MAX_PLAYERS - 1);
+	if (!PlayerIngame(playerId))
+	{
+		return RandomIngamePlayerId();
+	}
+	
+	return playerId;
+}

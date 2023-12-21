@@ -1,0 +1,36 @@
+actor PushableChair : PushableActor 20082
+{
+	radius 10
+	height 28
+	states
+	{
+		spawn:
+			CHAI A -1
+	}
+}
+
+actor PushableBarrel : PushableActor 10246
+{
+    radius 10
+    height 34
+	
+    states
+    {
+        Spawn:
+            BEXP B -1
+    }
+}
+
+actor MedicalPole : PushableActor 20083
+{
+	height 60
+	radius 7
+	scale .8
+	tag "Medical IV pole"
+	+FORCEYBILLBOARD
+	States
+	{
+		Spawn:
+			CTHR A -1
+	}
+}

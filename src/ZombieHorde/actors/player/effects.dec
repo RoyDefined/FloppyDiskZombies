@@ -1,0 +1,81 @@
+actor EffectBase
+{
+	+FORCEXYBILLBOARD
+	+CLIENTSIDEONLY
+	+DONTSPLASH
+	+NOTIMEFREEZE
+	+NOBLOCKMAP
+	+NOGRAVITY
+}
+
+actor BurningEffect : EffectBase
+{
+	States
+	{
+		Spawn:
+			TNT1 AA 0 NoDelay A_SpawnItemEx("BurningFireEffect", random(-10, 10), random(-10, 10), Frandom(1.0, 32.0), Frandom(-1.2, 1.2), Frandom(-1.2, 1.2), Frandom(1.0, 4.0), random(0, 359))
+			TNT1 A 0 A_SpawnItemEx("BurningSmokeEffect", random(-10, 10), random(-10, 10), Frandom(1.0, 32.0), Frandom(-1.5, 1.5), Frandom(-1.5, 1.5), Frandom(1.0, 2.5), random(0, 359))
+			stop
+	}
+}
+
+actor BurningSmokeEffect : EffectBase
+{
+	RenderStyle Translucent
+	
+	States
+	{
+		Spawn:
+			TNT1 A 0 NoDelay A_SetTranslucent(FRandom(0.5, 0.8))
+			TNT1 A 0 A_SetScale(Frandom(0.2, 0.5), FRandom(0.2, 0.5))
+			SMKD A 1 A_FadeOut(0.01)
+			wait
+	}
+}
+
+actor BurningFireEffect : EffectBase
+{
+	States
+	{
+		Spawn:
+			TNT1 A 0 NoDelay A_SetTranslucent(Frandom(0.2, 0.6))
+			TNT1 A 0 A_SetScale(Frandom(0.5, 1.0), Frandom(0.5, 1.0))
+			FIR1 ABCDABCDABCDEFGHI 1 A_ChangeVelocity (0, 0, Frandom(0.1, 0.3))
+			stop
+	}
+}
+
+actor InfectionFireEffect : EffectBase
+{
+	States
+	{
+		Spawn:
+			TNT1 AAAAAAAAAAAAAAAA 0 NoDelay A_SpawnItemEx("InfectionFire", random(-10, 10), random(-10, 10), Frandom(1.0, 32.0), random(-2, 2), random(-2, 2), Frandom(0.2, 2.0), random(0, 359))
+			TNT1 AAAAAAA 0 A_SpawnItemEx("InfectionFireLong", random(-10, 10), random(-10, 10), Frandom(1.0, 32.0), Frandom(-0.5, 0.5), Frandom(-0.5, 0.5), Frandom(-0.3, 0.3), random(0, 359))
+			stop
+	}
+}
+
+actor InfectionFire : EffectBase
+{
+	States
+	{
+		Spawn:
+			TNT1 A 0 NoDelay A_SetTranslucent(Frandom(0.4, 0.8))
+			TNT1 A 0 A_SetScale(Frandom(0.5, 1.0), Frandom(0.5, 1.0))
+			IFIR ABCDABCDABCDEFGHI 1 A_ChangeVelocity (0, 0, Frandom(0.1, 0.3))
+			stop
+	}
+}
+
+actor InfectionFireLong : EffectBase
+{
+	States
+	{
+		Spawn:
+			TNT1 A 0 NoDelay A_SetTranslucent(Frandom(0.4, 0.8))
+			TNT1 A 0 A_SetScale(Frandom(0.5, 1.0), Frandom(0.5, 1.0))
+			IFIR AAABBBCCCDDDEEEFFFGGGHHHIII 1 A_ChangeVelocity (0, 0, Frandom(0.1, 0.2))
+			stop
+	}
+}

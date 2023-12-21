@@ -1,0 +1,24 @@
+actor Discolamp : SwitchableDecoration 20085
+{
+	//$Category "Light sources"
+	//$NotAngled
+	tag "Disco Lamp"
+	scale .4
+	height 25
+	radius 16
+	mass 0x7FFFFFFF
+	health 0x7FFFFFFF
+	
+	+SOLID
+	+NOBLOOD
+	+SHOOTABLE
+	+NOGRAVITY
+	+SPAWNCEILING
+	+FORCEYBILLBOARD
+	
+	States
+	{
+		Spawn:
+            LAMP C -1
+	}
+}

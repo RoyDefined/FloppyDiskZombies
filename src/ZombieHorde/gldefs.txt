@@ -1,0 +1,49 @@
+flickerlight Flamer1
+{
+	color 1.0 0.5 0.0
+	size 96
+	secondarySize 90
+	chance 0.5
+}
+
+flickerlight Flamer2
+{
+	color 1.0 0.5 0.0
+	size 75
+	secondarySize 70
+	chance 0.5
+}
+
+flickerlight Flamer3
+{
+	color 0.75 0.25 0.0
+	size 40
+	secondarySize 35
+	chance 0.5
+}
+
+// Grenade explosion
+object GrenadeFlamePuff {
+	frame FIR1A {light Flamer1}
+	frame FIR1B {light Flamer1}
+	frame FIR1C {light Flamer1}
+	frame FIR1D {light Flamer2}
+	frame FIR1E {light Flamer2}
+	frame FIR1F {light Flamer2}
+	frame FIR1G {light Flamer3}
+	frame FIR1H {light Flamer3}
+	frame FIR1I {light Flamer3}
+}
+
+// Burning
+object BurningFireEffect {
+	frame FIR1A {light Flamer1}
+	frame FIR1B {light Flamer1}
+	frame FIR1C {light Flamer1}
+	frame FIR1D {light Flamer2}
+	frame FIR1E {light Flamer2}
+	frame FIR1F {light Flamer2}
+	frame FIR1G {light Flamer3}
+	frame FIR1H {light Flamer3}
+	frame FIR1I {light Flamer3}
+}

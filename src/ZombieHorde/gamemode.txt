@@ -1,0 +1,10 @@
+TeamLMS
+{
+    RemoveFlag DONTSPAWNMAPTHINGS
+	
+	GameSettings
+    {
+		sv_useteamstartsindm = true
+		sv_maxteams = 4
+	}
+}

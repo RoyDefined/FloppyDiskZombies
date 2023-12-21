@@ -1,0 +1,136 @@
+/*
+function void WeaponTick(void)
+{
+}
+*/
+
+// General weapon functions.
+function void WeaponTickClient(void) clientside
+{
+	if (!CheckInventory("IsZoomed")) {
+		ClearHudMessage(HUDID_SNIPER);
+		terminate;
+	}
+	
+	SetHudSize(1600, 900, false);
+	
+	SetFont("snipzm");
+	HudMessage(s:"a"; HUDMSG_PLAIN, HUDID_SNIPER, CR_UNTRANSLATED, 800.0, 450.0, 0);
+}
+
+/*
+function void WeaponHumanTick(void)
+{
+}
+
+function void WeaponHumanTickClient(void) clientside
+{
+}
+
+function void WeaponZombieTick(void)
+{
+}
+
+function void WeaponZombieTickClient(void) clientside
+{
+
+}
+
+*/
+
+script "WeaponLoop" (void)
+{
+	while(true)
+	{
+		if (!IsAlive())
+		{
+			Delay(const: 1);
+			continue;
+		}
+		
+		/*
+		WeaponTick();
+		
+		if (TeamIsHuman()) {
+			WeaponHumanTick();
+		}
+		
+		if (TeamIsZombie()) {
+			WeaponZombieTick();
+		}
+		*/
+		
+		Delay(const: 1);
+	}
+}
+
+script "WeaponLoopClient" (void) clientside
+{
+	while(true)
+	{
+		if (!IsAlive())
+		{
+			Delay(const: 1);
+			continue;
+		}
+		
+		WeaponTickClient();
+		
+		/*
+		if (TeamIsHuman()) {
+			WeaponHumanTickClient();
+		}
+		
+		if (TeamIsZombie()) {
+			WeaponZombieTickClient();
+		}
+		*/
+		
+		Delay(const: 1);
+	}
+}
+
+script "FireGrenadeHit"(void)
+{
+	// Hurt humans slightly, but set zombies on fire.
+	if (TeamIsHuman()) {
+		DamageThing(5);
+		terminate;
+	}
+	
+	if (!TeamIsZombie()) {
+		terminate;
+	}
+	
+	// Assume the script is already running when the zombie has burning left.
+	if (CheckInventory("BurningDamage"))
+	{
+		LogDebug(StrParam(s:"Adding burning to existing burning zombie ", s:PlayerName(PlayerNumber()), s:". Burning is now ", d:CheckInventory("BurningDamage") + 200));
+		GiveInventory("BurningDamage", 200);
+	}
+	else
+	{
+		GiveInventory("BurningDamage", 350);
+		
+		// TODO: Perhaps this should always run.
+		if (!ACS_NamedExecuteAlways("BurnActivator", 0)) {
+			LogWarning(StrParam(s:"Start player burning failed for player ", s:PlayerName(PlayerNumber())));
+		}
+	}
+}
+
+// Scratch effect from zombies
+script "ZombieScratch" (void) clientside
+{
+	SetHudSize(800, 450, false);
+	
+	fixed randomX = random(150.0, 650.0),
+		  randomY = random(200.0, 250.0);
+	int scratchType = random(1, 2);
+	for (int frame = 1; frame <= 4; ++frame)
+	{
+		SetFont(StrParam(s:"ZSLASH", d:scratchType, d:frame));
+		HudMessage(s:"a"; HUDMSG_FADEOUT, HUDID_SCRATCH, CR_UNTRANSLATED, randomX, randomY, 0.1, 1.5);
+		delay(1);
+	}
+}

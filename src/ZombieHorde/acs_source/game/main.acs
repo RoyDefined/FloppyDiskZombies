@@ -1,0 +1,255 @@
+#define MAPINFOX 20.1
+#define MAPINFOY 350.0
+
+function void OnCountdownFinished(void)
+{
+	SelectInitials();
+	
+	// Set remaining humans as human.
+	for (int i = 0; i < MAX_PLAYERS; ++i) {
+	
+		if (!PlayerInGame(i)) {
+			continue;
+		}
+		
+		if(!SetActivatorToPlayer(i)) {
+			LogError(StrParam(s:"Unable to enable weapons of ", d:i, s:": could not assign as activator."));
+			terminate;
+		}
+		SetActorProperty(0, APROP_DamageFactor, 1.0);
+		SetActivator(-1);
+		
+		if (PlayerTeamIsZombie(i)) {
+			continue;
+		}
+		
+		SetHuman(i);
+	}
+	
+	ACS_NamedExecute("StartRoundHintMessage", 0, 0, 0, 0);
+	SetGameState(playing);
+}
+
+function void OnPlayingFinished(void)
+{
+	// Kill all zombies if there are humans left.
+	if (HumanCount() > 0) {
+		KillAllZombies();
+	}
+	
+	SetGameState(ending);
+}
+
+function void OnEndingFinished(void)
+{
+	// Floppy Disk has no ending, it handles it self.
+#ifndef floppydisk
+	Exit_Normal(0);
+#endif
+}
+
+function void OnStateEnd(void)
+{
+	switch (gameContext.state)
+	{
+		case countdown:
+			OnCountdownFinished();
+			break;
+
+		case playing:
+			OnPlayingFinished();
+			break;
+
+		case ending:
+			gameContext.timerPaused = true;
+			OnEndingFinished();
+			break;
+	}
+}
+
+script "StartRoundHintMessage"(void)
+{
+	delay(35 * 2);
+	LogMessageToHumans("You are a human! Survive the zombie onslaught.");
+	LogMessageToZombies("You are a zombie! Infect all humans.");
+}
+
+function void GameTick(void)
+{
+	// Human count or zombie count reached zero during playtime.
+	int humansLeft = HumanCount();
+	int zombiesLeft = ZombieCount();
+	if (GameStateIsPlaying() && (!humansLeft || !zombiesLeft)) {
+		OnStateEnd();
+		terminate;
+	}
+	
+	// Below is related to the timer, checking if it reached zero, and otherwise removing a tic.
+	// Don't do any of that if the current state is disabled.
+	if (gameContext.state == playing && gameContext.playTimerDisabled) {
+		terminate;
+	}
+	if (gameContext.state == ending && gameContext.endTimerDisabled) {
+		terminate;
+	}
+	
+	int time = GetTimer(gameContext.state);
+	
+	// Timer reached zero.
+	if (time <= 0) {
+		OnStateEnd();
+		terminate;
+	}
+	
+	// Do not remove a tic from the timer if paused.
+	if (gameContext.timerPaused) {
+		terminate;
+	}
+	
+	AddTimer(gameContext.state, -1);
+}
+
+
+script "GameLoop"(void)
+{
+	while(true)
+	{
+		GameTick();
+		Delay(1);
+	}
+}
+
+function void DrawStartMessage(void)
+{
+	SetHudSize(480, 360, false);
+
+	str message = PlayerCount() < 2 ?
+		"This game requires atleast two players. Please spectate." :
+		StrParam(d:PlayerCount(), s:" players available.");
+		
+	HudMessageBold(s:message; HUDMSG_FADEOUT, HUDID_BOTTOM, CR_RED, 240.0, 340.0, 1.0, 0.5);
+}
+
+script "StartMessageLoop"(void)
+{
+	while(!IsPlaying())
+	{
+		DrawStartMessage();
+		Delay(1);
+	}
+}
+
+function void LogSettingDefaultsIssue(str setting)
+{
+	LogWarning(StrParam(s:"Setting '", s:setting, s:"' has not been properly configured. Please assign a value or use either the 'SetSurvivalDefaults()' or 'SetEscapeDefaults()' function before starting the gamemode."));
+}
+
+// Check the values that have been defined and ensure the game mode has been properly set.
+function bool CheckDefaults(void)
+{
+	// Mandatory settings:
+	// - Zombie health settings
+	// - Base player TID
+	
+	// `SetSurvivalDefaults` and `SetEscapeDefaults` exist to set up default values, including this.
+	
+	bool succes = true;
+	
+	// Only the zombie health settings and player TID are mandatory.
+	if (gameContext.playerTidBase == 0) {
+		LogSettingDefaultsIssue("player thing id");
+		succes = false;
+	}
+	
+	if (gameContext.initialZombieHealth == 0) {
+		LogSettingDefaultsIssue("initial zombie health");
+		succes = false;
+	}
+	
+	if (gameContext.secondaryZombieHealth == 0)	{
+		LogSettingDefaultsIssue("secondary zombie health");
+		succes = false;
+	}
+	
+	return succes;
+}
+
+// The purpose of this function is setting default values to the configurable
+// settings of the survival gamemode (timers, zombie health, etc.).
+function void SetSurvivalDefaults(void)
+{
+	// Floppy Disk mod does not have an ending timer since it has its own ending.
+	DisableEndTimer();
+	
+	if (gameContext.playerTidBase == 0) { SetBasePlayerTID(600); }
+	
+	if (gameContext.countdownTime == 0) { gameContext.countdownTime = 35 * 30; }
+	if (gameContext.playTime == 0)		{ gameContext.playTime = 35 * 120; }
+	if (gameContext.endingTime == 0)	{ gameContext.endingTime = 35 * 10; }
+	
+	if (gameContext.initialZombieHealth == 0)   { gameContext.initialZombieHealth = 4000; }
+	if (gameContext.secondaryZombieHealth == 0)	{ gameContext.secondaryZombieHealth = 1500; }
+}
+
+// The purpose of this function is setting default values to the configurable
+// settings of the escape gamemode (timers, zombie health, etc.).
+function void SetEscapeDefaults(void)
+{
+	// Escape maps do not have a play timer.
+	DisablePlayTimer();
+	
+#ifdef floppydisk
+	// Floppy Disk mod does not have an ending timer since it has its own ending.
+	DisableEndTimer();
+#endif
+	
+	// Initial zombies are teleported to a start spot.
+	if (gameContext.initialZombieSpawnId == 0) {
+		SetInitialZombieSpawnId(500);
+	}
+	
+	if (gameContext.playerTidBase == 0) { SetBasePlayerTID(600); }
+	
+	if (gameContext.countdownTime == 0) { gameContext.countdownTime = 35 * 10; }
+	if (gameContext.playTime != 0)		{ gameContext.playTime = 0; }
+	if (gameContext.endingTime == 0)	{ gameContext.endingTime = 35 * 10; }
+	
+	if (gameContext.initialZombieHealth == 0)   { gameContext.initialZombieHealth = 5000; }
+	if (gameContext.secondaryZombieHealth == 0)	{ gameContext.secondaryZombieHealth = 2000; }
+}
+
+function void StartMode(void)
+{
+	/* if (gameContext.mode == unset) {
+		LogWarning("Please set up the game mode before starting.");
+		terminate;
+	} */
+	
+	/* if (GameType() != GAME_NET_COOPERATIVE) {
+		LogWarning("This game mode was build for Team Last Man Standing. Please change your game type.");
+		terminate;
+	} */
+	
+	// Zandronum supports `SetCurrentGameMode`. However, this project was made for Floppy Disk Mod specifically,
+	// and Floppy Disk Mod has a build in system to configure this. If we are not in teamlms, then the map was
+	// not loaded properly and instead loaded through some obscure way.
+	if (!GetCvar("teamlms")) {
+		LogWarning("This game mode was build for Team Last Man Standing. Please change your game type.");
+		terminate;
+	}
+	
+	// Not enough players to play the game.
+	if (PlayerCount() < 2)
+	{
+		ACS_NamedExecuteAlways("StartMessageLoop", 0);
+		terminate;
+	}
+	
+	if (!CheckDefaults()) {
+		terminate;
+	}
+	
+	SetGameState(countdown);
+	ACS_NamedExecute("GameLoop", 0);
+	ACS_NamedExecute("TimerDisplay", 0);
+}

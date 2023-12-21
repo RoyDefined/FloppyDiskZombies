@@ -1,0 +1,149 @@
+
+function void SetTimer(GameState state, int time)
+{
+	if (state < countdown && state > ending) {
+		LogError(StrParam(d:state, s:" is not a valid game state to set time for."));
+		terminate;
+	}
+	
+	str gameStateString = state == none ? "none" :
+		state == countdown ? "countdown" :
+		state == playing ? "playing" :
+		"ending";
+	
+	/* if (IsPlaying()) {
+		LogWarning(StrParam(s:"Unable to set time for game state '", s:gameStateString, s:"', the game is already playing."));
+		terminate;
+	} */
+	
+	if (state == countdown) { gameContext.countDownTime = time; }
+	if (state == playing)   { gameContext.playTime = time; }
+	if (state == ending)    { gameContext.endingTime = time; }
+	
+	// Temporarely removed since it's being spammed by the timers.
+	//LogDebug(StrParam(s:"Time for game state '", s:gameStateString, s:"' has changed to ", d:time, s:"."));
+}
+
+function int GetTimer(GameState state)
+{
+	if (state < countdown && state > ending) {
+		LogError(StrParam(d:state, s:" is not a valid game state to get time for."));
+		return 0;
+	}
+	
+	if (state == countdown) { return gameContext.countDownTime; }
+	if (state == playing)   { return gameContext.playTime; }
+	return gameContext.endingTime;
+}
+
+function void AddTimer(GameState state, int time)
+{
+	SetTimer(state, GetTimer(state) + time);
+}
+
+function void SetCountdownTimer(int time) { SetTimer(countdown, time); }
+function void SetPlayingTimer(int time)   { SetTimer(playing, time); }
+function void SetEndingTimer(int time)    { SetTimer(ending, time); }
+function int GetCountdownTimer(void)	  { return GetTimer(countdown); }
+function int GetPlayingTimer(void)		  { return GetTimer(playing); }
+function int GetEndingTimer(void)		  { return GetTimer(ending); }
+function void AddCountdownTimer(int time) { AddTimer(countdown, time); }
+function void AddPlayingTimer(int time)	  { AddTimer(playing, time); }
+function void AddEndingTimer(int time)	  { AddTimer(ending, time); }
+
+function void DrawTime(void)
+{
+	SetHudSize(480, 360, false);
+	
+	// Don't show if the current state is disabled.
+	if (gameContext.state == playing && gameContext.playTimerDisabled) {
+		terminate;
+	}
+	if (gameContext.state == ending && gameContext.endTimerDisabled) {
+		terminate;
+	}
+
+	int time = GetTimer(gameContext.state);
+	
+	// Ensure the current game state has time to show.
+	if (time < 0) {
+		terminate;
+	}
+	
+	// If game state is playing, the last 10 seconds will have some effects.
+	if (GameStateIsPlaying())
+	{
+		str formattedTime = FormatTics(time, false);
+		HudMessageBold(s:formattedTime; HUDMSG_FADEOUT, HUDID_BOTTOM, CR_WHITE, 240.0, 340.0, 1.0, 0.5);
+	
+		// This ensures the timer ticks every second for the last 10 seconds.
+		bool timerCloseTick = time / 350 == 0 && time % 35 == 0;
+		if (!timerCloseTick) {
+			terminate;
+		}
+		
+		// Play a sound. If time is 0, it's the end.
+		int timeSecond = time / 35;
+		str sound = timeSecond == 0 ? "timer/end" : "timer/one";
+		AmbientSound(sound, 100);
+		
+		HudMessageBold(s:"0:", s:AddLeadingZero(timeSecond, 2); HUDMSG_FADEOUT, HUDID_BOTTOM - 1, CR_RED, 240.0, 340.0, 0.1, 0.5);
+	}
+	else
+	{
+		HudMessageBold(s:FormatTics(time, true); HUDMSG_FADEOUT, HUDID_BOTTOM, CR_WHITE, 240.0, 340.0, 1.0, 0.5);
+	}
+}
+
+// Pauses the timer. Note that this will effectively pause the timer but still show it.
+// This works for every game state.
+// If the timer should be fully omitted/returned for a specific mode, then use `(Disable|Enable)(Play|End)Timer` below.
+function void PauseTimer(void)
+{
+	gameContext.timerPaused = true;
+	LogDebug("Timer has been paused.");
+}
+
+// Resumes the timer. Note that this will effectively resume a paused timer.
+// This works for every game state.
+// If the timer should be fully omitted/returned for a specific mode, then use `(Disable|Enable)(Play|End)Timer` below.
+function void ResumeTimer(void)
+{
+	// Failsafe check to ensure the timer does not resume after the final timer has ended.
+	if (gameContext.state == ending && gameContext.endingTime == 0) {
+		LogWarning("Unable to resume timer when game is ending and the timer has ended.");
+		terminate;
+	}
+	
+	gameContext.timerPaused = false;
+	LogDebug("Timer has been resumed.");
+}
+
+function void DisablePlayTimer(void)
+{
+	gameContext.playTimerDisabled = true;
+}
+
+function void EnablePlayTimer(void)
+{
+	gameContext.playTimerDisabled = false;
+}
+
+function void DisableEndTimer(void)
+{
+	gameContext.endTimerDisabled = true;
+}
+
+function void EnableEndTimer(void)
+{
+	gameContext.endTimerDisabled = false;
+}
+
+script "TimerDisplay"(void)
+{
+	while(IsPlaying())
+	{
+		DrawTime();
+		Delay(1);
+	}
+}

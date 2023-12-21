@@ -1,0 +1,11 @@
+
+// Add leading zeroes. Returned as a string because integers remove excess zeroes.
+function str AddLeadingZero (int num, int size)
+{
+	str string = StrParam(d:num);
+	while (StrLen(string) < size) {
+		string = StrParam(d:0, s:string);
+	}
+
+	return string;
+}

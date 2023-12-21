@@ -1,0 +1,148 @@
+function void SetInitialZombieSpawnId(int id)
+{
+	if (GameStateIsPlaying() || GameStateIsEnding())
+	{
+		LogWarning("Unable to set initial zombie spawn id: game already playing.");
+		terminate;
+	}
+	
+	if (id < 0)
+	{
+		LogWarning("Unable to set initial zombie spawn id: id must be above 0");
+		terminate;
+	}
+	
+	gameContext.initialZombieSpawnId = id;
+}
+
+function void SetPlayerSafe(int id, bool safe)
+{
+	if (!PlayerInGame(id))
+	{
+		LogWarning(StrParam(s:"Unable to set id ", d:id, s:" safe to ", s:safe ? "true" : "false", s:": id not in game."));
+		terminate;
+	}
+
+	gameContext.players[id].safe = safe;
+	LogDebug(StrParam(s:PlayerName(id), s:" (", d:id, s:") ", s:safe ? "entered" : "left", s:" the safe zone."));
+}
+
+function void SetSafe(bool safe)
+{
+	SetPlayerSafe(PlayerNumber(), safe);
+}
+
+script "ScriptSetSafe"(void)
+{
+	SetPlayerSafe(PlayerNumber(), LineSide() == LINE_FRONT);
+}
+
+function bool IsPlayerSafe(int id)
+{
+	return gameContext.players[id].safe;
+}
+
+function bool IsSafe(void)
+{
+	return IsPlayerSafe(PlayerNumber());
+}
+
+function void KillAllZombies(void)
+{
+	SetActivator(-1);
+	
+	for (int i = 0; i < MAX_PLAYERS; i++) {
+		if (!PlayerInGame(i) || !PlayerTeamIsZombie(i)) {
+			continue;
+		}
+		
+		int tid = GetPlayerTIDById(i);
+		
+		// Should never happen. `GetPlayerTIDById` would have informed us at this point.
+		if (tid == -1) {
+			continue;
+		}
+		
+		Thing_Damage2(tid, INT_MAX, "None");
+	}
+}
+
+function void KillAllHumans(void)
+{
+	SetActivator(-1);
+	
+	for (int i = 0; i < MAX_PLAYERS; i++) {
+		if (!PlayerInGame(i) || !PlayerTeamIsHuman(i)) {
+			continue;
+		}
+		
+		int tid = GetPlayerTIDById(i);
+		
+		// Should never happen. `GetPlayerTIDById` would have informed us at this point.
+		if (tid == -1) {
+			continue;
+		}
+		
+		Thing_Damage2(tid, INT_MAX, "None");
+	}
+}
+
+function void KillUnsafeZombies(void)
+{
+	SetActivator(-1);
+	
+	for (int i = 0; i < MAX_PLAYERS; i++) {
+		if (!PlayerInGame(i) || !PlayerTeamIsZombie(i) || IsPlayerSafe(i)) {
+			continue;
+		}
+		
+		int tid = GetPlayerTIDById(i);
+		
+		// Should never happen. `GetPlayerTIDById` would have informed us at this point.
+		if (tid == -1) {
+			continue;
+		}
+		
+		Thing_Damage2(tid, INT_MAX, "None");
+	}
+}
+
+function void KillUnsafeHumans(void)
+{
+	SetActivator(-1);
+	
+	for (int i = 0; i < MAX_PLAYERS; i++) {
+		if (!PlayerInGame(i) || !PlayerTeamIsHuman(i) || IsPlayerSafe(i)) {
+			continue;
+		}
+		
+		int tid = GetPlayerTIDById(i);
+		
+		// Should never happen. `GetPlayerTIDById` would have informed us at this point.
+		if (tid == -1) {
+			continue;
+		}
+		
+		Thing_Damage2(tid, INT_MAX, "None");
+	}
+}
+
+function void KillUnsafePlayers(void)
+{
+	SetActivator(-1);
+	
+	for (int i = 0; i < MAX_PLAYERS; i++) {
+		if (!PlayerInGame(i) || IsPlayerSafe(i)) {
+			continue;
+		}
+		
+		int tid = GetPlayerTIDById(i);
+		
+		// Should never happen. `GetPlayerTIDById` would have informed us at this point.
+		if (tid == -1) {
+			continue;
+		}
+		
+		Thing_Damage2(tid, INT_MAX, "None");
+	}
+}

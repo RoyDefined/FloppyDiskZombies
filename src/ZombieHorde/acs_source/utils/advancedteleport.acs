@@ -1,0 +1,93 @@
+// The advanced teleport tries to teleport the sourceTID to the targetTID in one way or another.
+// It ensures no telefrags happen and if there is no room, it will try to teleport you in the general area.
+
+function bool AdvancedTeleport(int sourceTID, int targetTID, int threshold, fixed area, bool fog, bool transferVelocity)
+{
+	if (sourceTID == 0)
+	{
+		sourceTID = ActivatorTID();
+	}
+	
+	LogDebug(StrParam(s:"Start advanced teleport sending ", d:sourceTID, s:" to ", d:targetTID, s:"."));
+	
+	if (!IsTIDUsed(targetTID)) {
+		LogWarning(StrParam(s:"TID not used: ", d:targetTID, s:"."));
+		return false;
+	}
+	
+	fixed baseActorX = GetActorX(targetTID),
+		  baseActorY = GetActorY(targetTID),
+		  baseActorZ = GetActorZ(targetTID);
+	
+	fixed actorX = baseActorX,
+		  actorY = baseActorY,
+		  actorZ = baseActorZ;
+	
+	while(threshold > 0)
+	{
+		//LogDebug(StrParam(s:"Attempting. Threshold: ", d:threshold, s:", x: ", f:actorX, s:", y: ", f:actorY, s:", Z: ", f:actorZ));
+		
+		if (!SetActorPosition(sourceTID, actorX, actorY, actorZ, fog))
+		{
+			actorX = baseActorX + Random(-area, area);
+			actorY = baseActorY + Random(-area, area);
+			actorZ = baseActorZ + Random(0, area);
+			threshold--;
+			continue;
+		}
+		
+		if (!transferVelocity)
+		{
+			SetActorVelocity(sourceTID, 0.0, 0.0, 0.0, false, false);
+		}
+		
+		LogDebug("Teleport finished.");
+		return true;
+	}
+	
+	LogDebug("Teleport failed.");
+	return false;
+}
+
+// Responsible for teleporting a player on the map.
+// This script will continue to try and teleport a player until it succeeded.
+script "TeleportPlayer"(int min, int max, int area)
+{
+	while(true)
+	{
+		int currentMin = min;
+		while(currentMin <= max)
+		{
+			if (!AdvancedTeleport(ActivatorTID(), currentMin, 20, area, true, false))
+			{
+				currentMin++;
+				continue;
+			}
+
+			terminate;
+		}
+
+		delay(5);
+	}
+}
+
+// Same as above put velocity persists and no teleport for is displayed.
+script "TeleportPlayerSilent"(int min, int max, int area)
+{
+	while(true)
+	{
+		int currentMin = min;
+		while(currentMin <= max)
+		{
+			if (!AdvancedTeleport(ActivatorTID(), currentMin, 20, area, false, true))
+			{
+				currentMin++;
+				continue;
+			}
+
+			terminate;
+		}
+
+		delay(5);
+	}
+}

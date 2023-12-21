@@ -1,0 +1,31 @@
+actor CeilingLight : SwitchableDecoration 20580
+{
+	//$Category "Light sources"
+	//$NotAngled
+	tag "Ceiling Light"
+	scale .75
+	Radius 8
+	Height 12
+	health 1
+	
+	+SOLID
+	+NOBLOOD
+	+SHOOTABLE
+	+NOGRAVITY
+	+SPAWNCEILING
+	+FORCEYBILLBOARD
+	
+	States
+	{
+        Active:
+        Spawn:
+            CLMP A -1 BRIGHT Light("CeilingLight")
+           
+        Inactive:
+            CLMP A -1
+           
+        Death:
+			TNT1 A 0 A_PlaySound("decoration/glass/BREAK")
+            CLMP A -1
+	}
+}

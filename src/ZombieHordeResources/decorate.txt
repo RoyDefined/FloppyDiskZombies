@@ -1,0 +1,52 @@
+actor Plant
+{
+	//$Category "Decoration / Plants"
+	//$NotAngled
+	+FORCEYBILLBOARD
+	+CLIENTSIDEONLY
+	+NOINTERACTION
+}
+
+actor PushableActor
+{
+	//$Category "Decoration / Pushable"
+	//$NotAngled
+	health 0x7FFFFFFF
+	+SOLID
+	+SHOOTABLE
+	+NOBLOOD
+	//+PUSHABLE
+}
+
+actor Tree
+{
+	+FORCEYBILLBOARD
+	+SOLID
+	+SHOOTABLE
+	+NOBLOOD
+	+INVULNERABLE
+	Mass 0x7ffffff
+}
+
+actor Treespawner : RandomSpawner
+{
+	//$Category "Decoration / Trees"
+	//$NotAngled
+}
+
+#include "actors/decoration/generic.dec"
+#include "actors/decoration/fire.dec"
+#include "actors/decoration/vegetation.dec"
+#include "actors/decoration/steam.dec"
+#include "actors/decoration/plants.dec"
+
+#include "actors/decoration/generic/pushables.dec"
+
+#include "actors/decoration/shootable/toilet.dec"
+#include "actors/decoration/winterpine.dec"
+#include "actors/decoration/wintertree.dec"
+
+#include "actors/decoration/lightsources/ceilinglamp.dec"
+#include "actors/decoration/lightsources/discolamp.dec"
+#include "actors/decoration/lightsources/ceilinglight.dec"
+#include "actors/decoration/lightsources/lightbulb.dec"

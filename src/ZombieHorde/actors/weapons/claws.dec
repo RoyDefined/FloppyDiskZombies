@@ -1,0 +1,123 @@
+actor VirusPuff : BulletPuff
+{
+	+PUFFGETSOWNER
+	+PUFFONACTORS
+	+HITTRACER
+	+DONTSPLASH
+	
+	states
+    {
+		Spawn:
+		Melee:
+			NULL A 0
+			stop
+			
+		XDeath:
+			TNT1 A 10 ACS_NamedExecute("ZombieMeleeHit", 0, 0, 0)
+			stop
+    }
+}
+
+actor VirusPuffSound : VirusPuff
+{
+	AttackSound "weapons/claws/HIT"
+}
+
+actor ZombieClawsSpawn : ZHweaponSpawn 2710
+{
+	inventory.pickupmessage "Zombie claws"
+	tag "Zombie claws"
+	
+	States
+	{
+		// Spawn imitates a pistol, because you're not supposed to see it anyway.
+		Spawn:
+			PIST A -1
+			
+		Pickup:
+			TNT1 A 0 A_JumpIf(CallACS("CheckTeamIsZombie", 0, 0, 0) == true, "PickupSuccess")
+			stop
+		PickupSuccess:
+			TNT1 A 0 A_GiveInventory("ZombieClaws", 1)
+			stop
+	}
+}
+
+actor ZombieClaws : ZHWeapon
+{
+	Tag "Zombie Claws"
+	decal ""
+	weapon.SlotNumber 1
+	weapon.BobSpeed 0.3
+	+WEAPON.NOAUTOFIRE
+
+	States
+	{
+		Ready:
+			CLRD AAAAAABBBBBBCCCCCCEEEEEECCCCCCBBBBBB 1 A_WeaponReady
+			loop
+		
+		Fire:
+			// Failsafe and also just a way to prevent infections when not playing.
+			//TNT1 A 0 A_JumpIf(CallACS("ScriptGameStateIsPlaying", 0, 0, 0) == false, "Ready")
+			
+			CLFL AACC 1 A_WeaponReady(WRF_NOFIRE | WRF_NOSWITCH)
+			TNT1 A 0 A_PlaySound ("weapons/claws/SWING", CHAN_WEAPON)
+			CLFL D 1 A_WeaponReady(WRF_NOFIRE | WRF_NOSWITCH)
+			TNT1 A 0 A_CustomPunch(1, TRUE, 0, "VirusPuffSound", 72)
+			CLFL D 1 A_WeaponReady(WRF_NOFIRE | WRF_NOSWITCH)
+			TNT1 A 0 A_CustomPunch(1, TRUE, 0, "VirusPuff", 72)
+			CLFL D 1 A_WeaponReady(WRF_NOFIRE | WRF_NOSWITCH)
+			TNT1 A 0 A_CustomPunch(1, TRUE, 0, "VirusPuff", 72)
+			CLFL E 1 A_WeaponReady(WRF_NOFIRE | WRF_NOSWITCH)
+			TNT1 A 0 A_CustomPunch(1, TRUE, 0, "VirusPuff", 72)
+			CLFL G 1 A_WeaponReady(WRF_NOFIRE | WRF_NOSWITCH)
+			TNT1 A 0 A_CustomPunch(1, TRUE, 0, "VirusPuff", 72)
+			CLFL HHHH 1 A_WeaponReady(WRF_NOFIRE | WRF_NOSWITCH)
+			TNT1 A 0 A_CustomPunch(1, TRUE, 0, "VirusPuff", 72)
+			TNT1 A 0 A_Refire("Fire2")
+		FireLeftEnd:
+			CLFL KKLL 1 A_WeaponReady(WRF_NOFIRE | WRF_NOSWITCH)
+			goto ready
+		Fire2:
+			CLFR AAB 1 A_WeaponReady(WRF_NOFIRE | WRF_NOSWITCH)
+			TNT1 A 0 A_PlaySound ("weapons/claws/SWING", CHAN_WEAPON)
+			CLFR C 1 A_WeaponReady(WRF_NOFIRE | WRF_NOSWITCH)
+			TNT1 A 0 A_CustomPunch(1, TRUE, 0, "VirusPuffSound", 72)
+			CLFR D 1 A_WeaponReady(WRF_NOFIRE | WRF_NOSWITCH)
+			TNT1 A 0 A_CustomPunch(1, TRUE, 0, "VirusPuff", 72)
+			CLFR D 1 A_WeaponReady(WRF_NOFIRE | WRF_NOSWITCH)
+			TNT1 A 0 A_CustomPunch(1, TRUE, 0, "VirusPuff", 72)
+			CLFR E 1 A_WeaponReady(WRF_NOFIRE | WRF_NOSWITCH)
+			TNT1 A 0 A_CustomPunch(1, TRUE, 0, "VirusPuff", 72)
+			CLFR HHHH 1 A_WeaponReady(WRF_NOFIRE | WRF_NOSWITCH)
+			TNT1 A 0 A_Refire("Fire3")
+			CLFR HJJKKLL 1 A_WeaponReady(WRF_NOFIRE | WRF_NOSWITCH)
+			goto Ready
+		Fire3:
+			CLFL NNOO 1 A_WeaponReady(WRF_NOFIRE | WRF_NOSWITCH)
+			TNT1 A 0 A_PlaySound ("weapons/claws/SWING", CHAN_WEAPON)
+			CLFL PP 1 A_WeaponReady(WRF_NOFIRE | WRF_NOSWITCH)
+			TNT1 A 0 A_CustomPunch(1, TRUE, 0, "VirusPuffSound", 72)
+			CLFL Q 1 A_WeaponReady(WRF_NOFIRE | WRF_NOSWITCH)
+			TNT1 A 0 A_CustomPunch(1, TRUE, 0, "VirusPuff", 72)
+			CLFL Q 1 A_WeaponReady(WRF_NOFIRE | WRF_NOSWITCH)
+			TNT1 A 0 A_CustomPunch(1, TRUE, 0, "VirusPuff", 72)
+			CLFL R 1 A_WeaponReady(WRF_NOFIRE | WRF_NOSWITCH)
+			TNT1 A 0 A_CustomPunch(1, TRUE, 0, "VirusPuff", 72)
+			CLFL SSTT 1 A_WeaponReady(WRF_NOFIRE | WRF_NOSWITCH)
+			TNT1 A 0 A_Refire("Fire2")
+			goto FireLeftEnd
+		
+		Deselect:
+			CLFS ABCDEFGHIJ 1
+			TNT1 A 0 A_Lower
+			wait
+		
+		Select:
+			TNT1 A 0 A_Raise
+			TNT1 A 0 A_WeaponReady
+			CLFS JIHGFEDCBA 1
+			goto Ready
+	}
+}

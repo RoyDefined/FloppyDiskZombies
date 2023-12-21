@@ -1,0 +1,48 @@
+// timer
+timer/one "sounds/world/timerone.mp3"
+timer/end "sounds/world/timerend.mp3"
+
+// zombie claws
+weapons/claws/HIT1 "sounds/weapons/claws/hit1.ogg"
+weapons/claws/HIT2 "sounds/weapons/claws/hit2.ogg"
+weapons/claws/HIT3 "sounds/weapons/claws/hit3.ogg"
+weapons/claws/SWING1 "sounds/weapons/claws/swing1.wav"
+weapons/claws/SWING2 "sounds/weapons/claws/swing2.wav"
+weapons/claws/SWING3 "sounds/weapons/claws/swing3.wav"
+$random weapons/claws/HIT { weapons/claws/HIT1 weapons/claws/HIT2 weapons/claws/HIT3 } 
+$random weapons/claws/SWING { weapons/claws/SWING1 weapons/claws/SWING2 weapons/claws/SWING3 }
+
+// shotgun
+weapons/shotgun/COCKDOWN "sounds/weapons/shotgun/cockdown.wav"
+weapons/shotgun/COCKUP "sounds/weapons/shotgun/cockup.wav"
+weapons/shotgun/EMPTY "sounds/weapons/shotgun/empty.wav"
+weapons/shotgun/FIRE1 "sounds/weapons/shotgun/fire1.wav"
+weapons/shotgun/FIRE2 "sounds/weapons/shotgun/fire2.wav"
+weapons/shotgun/FIRE3 "sounds/weapons/shotgun/fire3.wav"
+weapons/shotgun/INSERT "sounds/weapons/shotgun/insert.wav"
+$random weapons/shotgun/FIRE { weapons/shotgun/FIRE1 weapons/shotgun/FIRE2 weapons/shotgun/FIRE3 }
+
+// sniper
+weapons/sniper/BACK "sounds/weapons/sniper/back.wav"
+weapons/sniper/FIRE "sounds/weapons/sniper/fire.wav"
+weapons/sniper/FORWARD "sounds/weapons/sniper/forward.wav"
+weapons/sniper/UP "sounds/weapons/sniper/up.wav"
+weapons/sniper/ZOOMIN "sounds/weapons/sniper/zoomin.wav"
+weapons/sniper/ZOOMOUT "sounds/weapons/sniper/zoomout.wav"
+
+// grenade
+weapons/grenade/BOUNCE "sounds/weapons/grenade/bounce.wav"
+weapons/grenade/EXPLODE "sounds/weapons/grenade/explode.wav"
+weapons/grenade/PINOUT "sounds/weapons/grenade/pinout.wav"
+weapons/grenade/REPIN "sounds/weapons/grenade/repin.wav"
+weapons/grenade/THROW "sounds/weapons/grenade/throw.wav"
+
+// zombie
+player/ZOMBIEDIE "sounds/player/zombiedie.wav"
+player/ZOMBIEHIT "sounds/player/zombiehit.wav"
+player/ZOMBIEWAKE1 "sounds/player/zombiewake1.wav"
+player/ZOMBIEWAKE2 "sounds/player/zombiewake2.wav"
+player/ZOMBIEWAKE3 "sounds/player/zombiewake3.wav"
+player/ZOMBIEWAKE4 "sounds/player/zombiewake4.wav"
+player/ZOMBIEWAKE5 "sounds/player/zombiewake5.wav"
+$random player/ZOMBIEWAKE { player/ZOMBIEWAKE1 player/ZOMBIEWAKE2 player/ZOMBIEWAKE3 player/ZOMBIEWAKE4 player/ZOMBIEWAKE5 }

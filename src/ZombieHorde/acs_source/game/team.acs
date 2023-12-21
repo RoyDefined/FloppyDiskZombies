@@ -1,0 +1,432 @@
+function bool PlayerTeamIsNone(int id)   { return gameContext.players[id].type == none; }
+function bool PlayerTeamIsHuman(int id)  { return gameContext.players[id].type == human; }
+function bool PlayerTeamIsZombie(int id) { return gameContext.players[id].type == zombie; }
+function bool TeamIsNone(void)   		 { return PlayerTeamIsNone(PlayerNumber()); }
+function bool TeamIsHuman(void)  		 { return PlayerTeamIsHuman(PlayerNumber()); }
+function bool TeamIsZombie(void) 		 { return PlayerTeamIsZombie(PlayerNumber()); }
+script "CheckTeamIsNone"(void)   		 { SetResultValue(TeamIsNone()); }
+script "CheckTeamIsHuman"(void)  		 { SetResultValue(TeamIsHuman()); }
+script "CheckTeamIsZombie"(void) 		 { SetResultValue(TeamIsZombie()); }
+
+script "CheckTargetTeamIsNone"(void)
+{
+	if (!SetActivatorToTarget(0))
+	{
+		LogWarning("Could not set activator to target.");
+		terminate;
+	}
+	
+	SetResultValue(TeamIsNone());
+}
+
+script "CheckTargetTeamIsHuman"(void)
+{
+	if (!SetActivatorToTarget(0))
+	{
+		LogWarning("Could not set activator to target.");
+		terminate;
+	}
+	
+	SetResultValue(TeamIsHuman());
+}
+
+script "CheckTargetTeamIsZombie"(void)
+{
+	if (!SetActivatorToTarget(0))
+	{
+		LogWarning("Could not set activator to target.");
+		terminate;
+	}
+	
+	SetResultValue(TeamIsZombie());
+}
+
+
+function void LogMessageToHumans(str message)
+{
+	for (int i = 0; i < MAX_PLAYERS; ++i)
+	{
+		if (!PlayerTeamIsHuman(i)) {
+			continue;
+		}
+		
+		LogMessageClient(message, i);
+	}
+}
+
+function void LogMessageToZombies(str message)
+{
+	for (int i = 0; i < MAX_PLAYERS; ++i)
+	{
+		if (!PlayerTeamIsZombie(i)) {
+			continue;
+		}
+		
+		LogMessageClient(message, i);
+	}
+}
+
+function int HumanCount(void)
+{
+	int count;
+	for (int i = 0; i < MAX_PLAYERS; ++i)
+	{
+		if (!PlayerTeamIsHuman(i)) {
+			continue;
+		}
+		
+		count++;
+	}
+	
+	return count;
+}
+
+function int ZombieCount(void)
+{
+	int count;
+	for (int i = 0; i < MAX_PLAYERS; ++i)
+	{
+		if (!PlayerTeamIsZombie(i)) {
+			continue;
+		}
+		
+		count++;
+	}
+	
+	return count;
+}
+
+function void GiveHumanWeapons(void)
+{
+	GiveInventory("HuntingShotgun", 1);
+	GiveInventory("SniperRifle", 1);
+}
+
+// Fully reset settings on the activator
+function void ResetSettings(void)
+{
+	TakeInventory("ThrowPower", 999);
+	
+	if (CheckInventory("GrenadeAmmo"))
+	{
+		SpawnForced("GrenadeSpawn", GetActorX(0), GetActorY(0), GetActorFloorZ(0) + 8);
+		TakeInventory("GrenadeAmmo", 1);
+	}
+	
+	TakeInventory("ShotgunPump", 1);
+	GiveInventory("ShotgunShell", 8);
+	
+	TakeInventory("SniperBolting", 1);
+	TakeInventory("IsZoomed", 1);
+	TakeInventory("SniperZoomlevel", 2);
+}
+
+function void SetInitialZombieHealth(int health)
+{
+	if (GameStateIsPlaying() || GameStateIsEnding())
+	{
+		LogWarning("Initial zombie health values must be assigned before the game has started.");
+		terminate;
+	}
+	
+	if (health < 1500)
+	{
+		LogWarning("Initial zombie health must be 1500 or higher.");
+		terminate;
+	}
+	
+	gameContext.initialZombieHealth = health;
+}
+
+function void SetSecondaryZombieHealth(int health)
+{
+	if (GameStateIsPlaying() || GameStateIsEnding())
+	{
+		LogWarning("Secondary zombie health values must be assigned before the game has started.");
+		terminate;
+	}
+	
+	if (health < 800)
+	{
+		LogWarning("Secondary zombie health must be 800 or higher.");
+		terminate;
+	}
+	
+	gameContext.secondaryZombieHealth = health;
+}
+
+// Set player as human.
+// NOTE: This function is the main function to tell the gamemode of a human.
+// `Cure()` should be used if a player is "cured" from a zombie in actual gameplay.
+function void SetHuman(int id)
+{
+	if(PlayerTeamIsHuman(id)) {
+		terminate;
+	}
+	
+	if(!SetActivatorToPlayer(id)) {
+		LogError(StrParam(s:"Unable to set ", d:id, s:" as human: could not assign as activator."));
+		terminate;
+	}
+
+#ifdef floppydisk
+	str class = "FloppyPlayer";
+#else
+	str class = "DoomPlayer";
+#endif
+	
+	if (GetActorClass(0) != class && !UnMorphActor(0, true)) {
+		LogError(StrParam(s:"Failed to morph ", s:PlayerName(id), s:" into a human (class = ", s:class, s:")."));
+		terminate;
+	}
+	
+#ifdef dev
+	bool noBroadcastTeamChange = false;
+#else
+	bool noBroadcastTeamChange = true;
+#endif
+
+	if (!Player_SetTeam(TEAM_BLUE, noBroadcastTeamChange)) {
+		LogError(StrParam(s:"Failed to set team of ", s:PlayerName(id), s:" into blue."));
+		terminate;
+	}
+	GiveInventory("PlayerSpeedModifier", 1);
+	
+	SetActivator(-1);
+	
+	gameContext.players[id].type = human;
+	LogDebug(StrParam(s:PlayerName(id), s:" (", d:id, s:") is now a human."));
+}
+
+// Set player as zombie.
+// NOTE: This function is the main function to tell the gamemode of a zombie.
+// `Infect()` should be used if a player is "infected" by a zombie in actual gameplay.
+function void SetZombie(int id)
+{
+	if(PlayerTeamIsZombie(id)) {
+		terminate;
+	}
+	
+	if(!SetActivatorToPlayer(id)) {
+		LogError(StrParam(s:"Unable to set ", d:id, s:" as zombie: could not assign as activator."));
+		terminate;
+	}
+
+	// Morph flags.
+	// For now just `MRF_NEWTIDBEHAVIOUR`. This is required because the zombie is missing its TID otherwise.
+	int flags = MRF_NEWTIDBEHAVIOUR;
+	
+	// The actor `mapspot` is an easy way to prevent any flashes whilst playing.
+	if (GetActorClass(0) != "ZombiePlayer" && !MorphActor(0, "ZombiePlayer", "", 1048576, flags, "mapspot", "mapspot")) {
+		LogError(StrParam(s:"Failed to morph ", s:PlayerName(id), s:" into a zombie."));
+		terminate;
+	}	
+	
+#ifdef dev
+	bool noBroadcastTeamChange = false;
+#else
+	bool noBroadcastTeamChange = true;
+#endif
+	
+	if (!Player_SetTeam(TEAM_RED, noBroadcastTeamChange)) {
+		LogError(StrParam(s:"Failed to set team of ", s:PlayerName(id), s:" into red."));
+		terminate;
+	}
+	TakeInventory("PlayerSpeedModifier", 1);
+	ResetSettings();
+	
+	SetActivator(-1);
+	
+	gameContext.players[id].type = zombie;
+	LogDebug(StrParam(s:PlayerName(id), s:" (", d:id, s:") is now a zombie."));
+}
+
+function void Cure(int curedId)
+{
+	if (!PlayerInGame(curedId)) {
+		LogWarning(StrParam(s:"Parameter is invalid for curing (", d:curedId, s:")."));
+		terminate;
+	}
+	
+	// TODO: Verify the human is properly cured. Maybe health must be set.
+	str curedName = PlayerName(curedId);
+	LogMessage(StrParam(s:"\cf", s:curedName, s:"\cj has miraculously been cured!"));
+	SetHuman(curedId);
+}
+
+function void Infect(int infector, int infected)
+{
+	if (!PlayerInGame(infector) || !PlayerInGame(infected)) {
+		LogWarning(StrParam(s:"One or more parameter is invalid for infection (", d:infector, s:"/", d:infected, s:")."));
+		terminate;
+	}
+	
+	str infectedName = PlayerName(infected);
+	str infectorName = PlayerName(infector);
+	LogMessage(StrParam(s:"\cf", s:infectedName, s:"\cj has been infected by \cf", s:infectorName, s:"\cj!"));
+	SetZombie(infected);
+	
+	if(!SetActivatorToPlayer(infected)) {
+		LogError(StrParam(s:"Unable to set stats for secondary zombie ", d:infected, s:": could not assign as activator."));
+		terminate;
+	}
+	
+	int health = gameContext.secondaryZombieHealth;
+	PlaySound(0, "player/ZOMBIEWAKE", CHAN_AUTO);
+	SetActorProperty(0, APROP_SPAWNHEALTH, health);
+	SetActorProperty(0, APROP_HEALTH, health);
+	
+	if (!SpawnForced("InfectionFireEffect", GetActorX(0), GetActorY(0), GetActorZ(0))) {
+		LogWarning(StrParam(s:"Failed to spawn infection effect for ", s:PlayerName(PlayerNumber()), s:"."));
+	}
+	
+	if (!NamedExecuteClientScript("ZombieScratch", PlayerNumber())) {
+		LogError(StrParam(s:"Zombie scratch effect failed for ", s:PlayerName(PlayerNumber()), s:"."));
+	}
+}
+
+function void RemovePlayer(int id)
+{
+	gameContext.players[id].type = none;
+	LogDebug(StrParam(s:PlayerName(id), s:" (", d:id, s:") is now removed."));
+}
+
+function void SelectInitials(void)
+{
+	// minimum of 1 zombie, and 1 added every 16 players.
+	int zombieChooseCount = PlayerCount()/16 + 1;
+	
+	int zombiesChosen;
+	while (zombiesChosen < zombieChooseCount)
+	{
+		int id = RandomIngamePlayerId();
+		if (PlayerTeamIsZombie(id)) {
+			continue;
+		}
+		
+		// Teleport the zombie to a spawn if defined.
+		// This must happen before `SetZombie` because I can't teleport a morphed actor.
+		if (gameContext.initialZombieSpawnId != 0) {
+			int destinationTID = gameContext.initialZombieSpawnId + zombiesChosen;
+			
+			if (!IsTIDUsed(destinationTID))
+			{
+				logWarning(StrParam(s:"Unable to move initial zombie to spawn: destination ", d:destinationTID, s:" does not exist."));
+			}
+			else
+			{
+				int tid = GetPlayerTIDById(id);
+		
+				// This should never fail. `GetPlayerTIDById` would have informed us at this point.
+				if (tid != -1) {
+					LogDebug(StrParam(s:"Teleporting initial zombie ", d:tid, s:" to ", d:destinationTID, s:"."));
+					TeleportOther(tid, destinationTID, false);
+				}
+			}
+		}
+		
+		SetZombie(id);
+		
+		if(!SetActivatorToPlayer(id)) {
+			LogError(StrParam(s:"Unable to set stats for initial zombie ", d:id, s:": could not assign as activator."));
+			terminate;
+		}
+		
+		int health = gameContext.initialZombieHealth;
+		PlaySound(0, "player/ZOMBIEWAKE", CHAN_AUTO);
+		SetActorProperty(0, APROP_SPAWNHEALTH, health);
+		SetActorProperty(0, APROP_HEALTH, health);
+		
+		zombiesChosen++;
+	}
+	
+	str message = "";
+	for (int i = 0; i < MAX_PLAYERS; ++i)
+	{
+		if (!PlayerTeamIsZombie(i)) {
+			continue;
+		}
+		
+		zombiesChosen--;
+		message = StrParam(s:message, s:PlayerName(i), s:zombiesChosen == 0 ? "" : zombiesChosen == 1 ? " and " : ", ");
+	}
+	
+	LogDebug(StrParam(s:message, s:zombieChooseCount > 1 ? " have " : " has ", s:"been chosen as the initial zombie", s:zombieChooseCount > 1 ? "s." : "."));
+}
+
+script "ZombieMeleeHit"(void)
+{
+	int infectedTID = GetActorProperty(0, APROP_TRACERTID);
+	
+	// Didn't hit a player.
+	if (!IsValidPlayerTID(infectedTID)) {
+		terminate;
+	}
+	
+	if (!SetActivatorToTarget(0)) {
+		LogError("Failed to find target during melee hit.");
+		terminate;
+	}
+	
+	int infectorId = PlayerNumber();
+	SetActivator(-1);
+	
+	int infectedId = GetPlayerIDByTID(infectedTID);
+	
+	// This should not happen, but `GetPlayerIDByTID` would have informed us about it.
+	if (infectedId == -1) {
+		terminate;
+	}
+	
+	// Puff hit a zombie
+	if (PlayerTeamIsZombie(infectedId)) {
+		terminate;
+	}
+	
+	if (!gameContext.playTimerDisabled) {
+		AddPlayingTimer(35 * 30);
+	}
+	
+	//str infectedName = PlayerName(infectedId);
+	//str infectorName = PlayerName(infectorId);
+	//LogDebug(StrParam(s:infectorName, s:" (", d:infectorId, s:")", s:" has hit ", s:infectedName, s:" (", d:infectedId, s:")", s:"."));
+	Infect(infectorId, infectedId);
+}
+
+script "BurnActivator"(void)
+{
+	LogDebug(StrParam(s:"Start burning damage for ", s:PlayerName(PlayerNumber()), s:" for ", d:CheckInventory("BurningDamage"), s:" tics."));
+	
+	SetActorProperty(0, APROP_SPEED, FixedMul(GetActorProperty(0, APROP_SPEED), 0.2));
+	
+	while (CheckInventory("BurningDamage") && GetActorWaterlevel(0) < 3)
+	{
+		if (Timer() % 4 == 0) {
+			if (!SpawnForced("BurningEffect", GetActorX(0), GetActorY(0), GetActorZ(0))) {
+				LogWarning(StrParam(s:"Failed to spawn burning effect for ", s:PlayerName(PlayerNumber()), s:"."));
+			}
+		}
+		
+		if (Timer() % 10 == 0) {
+			DamageThing(10);
+		}
+		
+		if (Timer() % 35 == 0) {
+			LogDebug(StrParam(s:"Burning left for ", s:PlayerName(PlayerNumber()), s:": ", d:CheckInventory("BurningDamage"), s:"."));
+		}
+		
+		TakeInventory("BurningDamage", 1);
+		delay(1);
+	}
+	
+	if (TeamIsZombie()) {
+		SetActorProperty(0, APROP_SPEED, 1.25);
+		terminate;
+	}
+	if (TeamIsHuman()) {
+		SetActorProperty(0, APROP_SPEED, 1.25);
+		terminate;
+	}
+	
+	SetActorProperty(0, APROP_SPEED, 1.0);
+}

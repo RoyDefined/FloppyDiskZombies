@@ -1,0 +1,52 @@
+script "OnEnter" enter
+{
+	AssignPlayerTID();
+	ClearInventory();
+	GiveHumanWeapons();
+	SetActorProperty(0, APROP_DamageFactor, 0.0);
+	
+	GiveInventory("PlayerSpeedModifier", 1);
+	
+	int failCount;
+	if (!ACS_NamedExecuteAlways("WeaponLoop", 0)) {
+		LogError(StrParam(s:"Weapon loop could not be started for ", s:PlayerName(PlayerNumber()), s:"."));
+	}
+	
+	if (!NamedExecuteClientScript("WeaponLoopClient", PlayerNumber())) {
+		LogError(StrParam(s:"Client weapon loop could not be started for ", s:PlayerName(PlayerNumber()), s:"."));
+	}
+}
+
+script "ClientOpen" open clientside
+{
+	ACS_NamedExecute("DrawMapInfo", 0);
+}
+
+script "OnDisconnect" (int id) disconnect
+{
+	RemovePlayer(id);
+}
+
+script "OnDeath" death
+{
+	Thing_ChangeTID(0, 0);
+	RemovePlayer(PlayerNumber());
+	ClearInventory();
+}
+
+script "DrawMapInfo" (void) clientside
+{
+	str levelName = StrParam(n:PRINTNAME_LEVELNAME);
+	int mapInfoHorizontal = MAPINFOX,
+		mapInfoVertical = MAPINFOY;
+	
+	SetHudSize(960, 600, TRUE);
+	SetFont("BigFont");
+	HudMessage(s:"\cgZombie Horde \cj- ", s:levelName; HUDMSG_TYPEON, 0, CR_UNTRANSLATED, mapInfoHorizontal, mapInfoVertical, 6.0, 0.05, 0.5);
+	
+	delay(35*2);
+	
+	SetHudSize(960, 600, TRUE);
+	SetFont("SmallFont");
+	HudMessage(s:"By FusedQyou"; HUDMSG_FADEINOUT, 0, CR_WHITE, mapInfoHorizontal, mapInfoVertical + 13.0, 4.0, 1.0, 0.5);
+}

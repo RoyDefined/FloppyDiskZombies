@@ -1,0 +1,93 @@
+// base resist message offsets.
+#define RESISTX 0.5
+#define RESISTY 0.17
+
+function int Resist(str reason, str timeString, int totalTime)
+{
+	if (totalTime <= 0)
+	{
+		LogWarning(StrParam(d:totalTime, s:" is not a valid time for a resist."));
+		return 0;
+	}
+	
+	if (!ACS_NamedExecuteAlways("MainResistLoop", 0, reason, timeString, totalTime)) {
+		LogWarning("Resist display could not start.");
+	}
+	
+	return 35 * totalTime;
+}
+
+// Function to determine the color that should be used for a resist.
+function str resistColor (int time, int maxTime)
+{
+	int fullTime = Percentage(time, maxTime);
+
+	return fullTime < 10 ? "\cm" :
+	    fullTime < 20 ? "\cg" :
+	    fullTime < 40 ? "\ci" :
+	    fullTime < 60 ? "\ck" :
+	    fullTime < 80 ? "\cq" :
+	    "\cd";
+}
+
+// main resist print message
+function void ResistMessage (str mainReason, str timeReason)
+{
+	int resistHorizontal = RESISTX,
+		resistVertical = RESISTY;
+	
+	int resistTopHudId = HUDID_RESIST,
+		resistBottomHudId = HUDID_RESIST + 1;
+	
+	if (mainReason != 0)
+	{
+		SetFont("SMALLFONT");
+		HudMessage(s:mainReason; HUDMSG_FADEOUT, resistTopHudId, CR_UNTRANSLATED, resistHorizontal, resistVertical, 1.5, 0.5);
+	}
+	
+	SetFont("BIGFONT");
+	HudMessage(s:timeReason; HUDMSG_FADEOUT, resistBottomHudId, CR_UNTRANSLATED, resistHorizontal, resistVertical + 0.03, 0.5, 0.5);
+}
+
+function void CreateResistMessage(str reason, str timeString, int time, int totalTime)
+{
+	// If `reason` contains "second"/"seconds" in the string, then format it depending on the time left.
+	bool hasSecond = StrFind(timeString, "second") != -1;
+	bool hasSeconds = StrFind(timeString, "seconds") != -1;
+	if (hasSeconds && time == 1) {
+		timeString = StrReplace(timeString, "seconds", "second");
+	}
+	if (!hasSeconds && hasSecond && time != 1) {
+		timeString = StrReplace(timeString, "second", "seconds");
+	}
+	
+	// Color the time and add it to the time string.
+	// Do not apply a custom color if the user did it themselves.
+	if (WordIsColored(timeString, "%t")) {
+		timeString = StrReplace(timeString, "%t", StrParam(d:time));
+	}
+	else {
+		str color = resistColor(time, totalTime);
+		str timeColored = StrParam(s:color, d:time);
+		timeString = StrReplace(timeString, "%t", timeColored);
+	}
+
+	ResistMessage(reason, timeString);
+}
+
+script "MainResistLoop"(str reason, str timeString, int totalTime)
+{
+	SetActivator(-1);
+	LogDebug(StrParam(s:"Starting resist, time: ", d:totalTime, s:"."));
+	
+	int timeLeft = totalTime;
+	while (timeLeft > 0)
+	{
+		SetHudSize(0, 0, false);
+		
+		str finalTimeString = timeString;
+		CreateResistMessage(reason, timeString, timeLeft, totalTime);
+		timeLeft--;
+		delay(35);
+	}
+}

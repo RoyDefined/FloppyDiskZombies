@@ -1,0 +1,14 @@
+actor Incendie 10342
+{
+	//$Category "Zombie Horde Decoration"
+	//$NotAngled
+	
+	height 32
+	radius 16
+	
+	states
+	{
+		Spawn:
+			INCE A -1
+	}
+}

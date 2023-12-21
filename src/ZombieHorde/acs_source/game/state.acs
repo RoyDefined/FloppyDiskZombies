@@ -1,0 +1,20 @@
+function GameState GetGameState(void)	  { return gameContext.state; }
+function bool GameStateIsNone(void)		  { return GetGameState() == none; }
+function bool GameStateIsCountdown(void)  { return GetGameState() == countdown; }
+function bool GameStateIsPlaying(void) 	  { return GetGameState() == playing; }
+function bool GameStateIsEnding(void) 	  { return GetGameState() == ending; }
+script "ScriptGameStateIsNone"(void)   	  { SetResultValue(GameStateIsNone()); }
+script "ScriptGameStateIsCountdown"(void) { SetResultValue(GameStateIsCountdown()); }
+script "ScriptGameStateIsPlaying"(void)	  { SetResultValue(GameStateIsPlaying()); }
+script "ScriptGameStateIsEnding"(void)	  { SetResultValue(GameStateIsEnding()); }
+
+function void SetGameState(GameState state)
+{
+	gameContext.state = state;
+	
+	str gameStateString = state == none ? "none" :
+		state == countdown ? "countdown" :
+		state == playing ? "playing" :
+		"ending";
+	LogDebug(StrParam(s:"Game state has switched to '", s:gameStateString, s:"'."));
+}

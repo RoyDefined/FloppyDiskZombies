@@ -1,0 +1,353 @@
+/*
+** -----------------------------------------------------------------------------
+** main spawner
+** -----------------------------------------------------------------------------
+*/
+
+actor Wintertree : TreeSpawner 20573
+{
+	//$Sprite WINTA0
+	tag "Winter tree"
+	DropItem "WintertreeSpawner1" 255, 1
+	DropItem "WintertreeSpawner2" 255, 1
+	DropItem "WintertreeSpawner3" 255, 1
+	DropItem "WintertreeSpawner4" 255, 1
+	DropItem "WintertreeSpawner5" 255, 1
+	DropItem "WintertreeSpawner6" 255, 1
+	DropItem "WintertreeSpawner7" 255, 1
+}
+
+/*
+** -----------------------------------------------------------------------------
+** Sub spawners
+** -----------------------------------------------------------------------------
+*/
+
+actor WintertreeSpawner1 : RandomSpawner
+{
+	DropItem "Wintertree1Huge" 255, 1
+	DropItem "Wintertree1Big" 255, 1
+	DropItem "Wintertree1Medium" 255, 1
+	DropItem "Wintertree1Small" 255, 1
+}
+
+actor WintertreeSpawner2 : RandomSpawner
+{
+	DropItem "Wintertree2Huge" 255, 1
+	DropItem "Wintertree2Big" 255, 1
+	DropItem "Wintertree2Medium" 255, 1
+	DropItem "Wintertree2Small" 255, 1
+}
+
+actor WintertreeSpawner3 : RandomSpawner
+{
+	DropItem "Wintertree3Huge" 255, 1
+	DropItem "Wintertree3Big" 255, 1
+	DropItem "Wintertree3Medium" 255, 1
+	DropItem "Wintertree3Small" 255, 1
+}
+
+actor WintertreeSpawner4 : RandomSpawner
+{
+	DropItem "Wintertree4Huge" 255, 1
+	DropItem "Wintertree4Big" 255, 1
+	DropItem "Wintertree4Medium" 255, 1
+	DropItem "Wintertree4Small" 255, 1
+}
+
+actor WintertreeSpawner5 : RandomSpawner
+{
+	DropItem "Wintertree5Huge" 255, 1
+	DropItem "Wintertree5Big" 255, 1
+	DropItem "Wintertree5Medium" 255, 1
+	DropItem "Wintertree5Small" 255, 1
+}
+
+actor WintertreeSpawner6 : RandomSpawner
+{
+	DropItem "Wintertree6Huge" 255, 1
+	DropItem "Wintertree6Big" 255, 1
+	DropItem "Wintertree6Medium" 255, 1
+	DropItem "Wintertree6Small" 255, 1
+}
+
+actor WintertreeSpawner7 : RandomSpawner
+{
+	DropItem "Wintertree7Huge" 255, 1
+	DropItem "Wintertree7Big" 255, 1
+	DropItem "Wintertree7Medium" 255, 1
+	DropItem "Wintertree7Small" 255, 1
+}
+
+/*
+** -----------------------------------------------------------------------------
+** Winter tree 1
+** -----------------------------------------------------------------------------
+*/
+
+actor Wintertree1Huge : Tree
+{
+	scale 1.5
+	Height 180
+	Radius 14
+	States
+	{
+		Spawn:
+			WINT A -1
+	}
+}
+
+actor Wintertree1Big : Wintertree1Huge
+{
+	scale 1.25
+	Height 150
+	Radius 13
+}
+
+actor Wintertree1Medium : Wintertree1Huge
+{
+	scale 1
+	Height 120
+	Radius 12
+}
+
+actor Wintertree1Small : Wintertree1Huge
+{
+	scale .8
+	Height 90
+	Radius 12
+}
+
+/*
+** -----------------------------------------------------------------------------
+** Winter tree 2
+** -----------------------------------------------------------------------------
+*/
+
+actor Wintertree2Huge : Tree
+{
+	scale 1.5
+	Height 160
+	Radius 10
+	States
+	{
+		Spawn:
+			WINT B -1
+	}
+}
+
+actor Wintertree2Big : Wintertree2Huge
+{
+	scale 1.25
+	Height 130
+	Radius 10
+}
+
+actor Wintertree2Medium : Wintertree2Huge
+{
+	scale 1
+	Height 100
+	Radius 8
+}
+
+actor Wintertree2Small : Wintertree2Huge
+{
+	scale .8
+	Height 80
+	Radius 8
+}
+
+/*
+** -----------------------------------------------------------------------------
+** Winter tree 3
+** -----------------------------------------------------------------------------
+*/
+
+actor Wintertree3Huge : Tree
+{
+	scale 1.5
+	Height 210
+	Radius 10
+	States
+	{
+		Spawn:
+			WINT C -1
+	}
+}
+
+actor Wintertree3Big : Wintertree3Huge
+{
+	scale 1.25
+	Height 180
+	Radius 10
+}
+
+actor Wintertree3Medium : Wintertree3Huge
+{
+	scale 1
+	Height 140
+	Radius 8
+}
+
+actor Wintertree3Small : Wintertree3Huge
+{
+	scale .8
+	Height 110
+	Radius 8
+}
+
+/*
+** -----------------------------------------------------------------------------
+** Winter tree 4
+** -----------------------------------------------------------------------------
+*/
+
+actor Wintertree4Huge : Tree
+{
+	scale 1.5
+	Height 250
+	Radius 20
+	States
+	{
+		Spawn:
+			WINT D -1
+	}
+}
+
+actor Wintertree4Big : Wintertree4Huge
+{
+	scale 1.25
+	Height 200
+	Radius 20
+}
+
+actor Wintertree4Medium : Wintertree4Huge
+{
+	scale 1
+	Height 160
+	Radius 18
+}
+
+actor Wintertree4Small : Wintertree4Huge
+{
+	scale .9
+	Height 140
+	Radius 18
+}
+
+/*
+** -----------------------------------------------------------------------------
+** Winter tree 5
+** -----------------------------------------------------------------------------
+*/
+
+actor Wintertree5Huge : Tree
+{
+	scale 1.25
+	Height 80
+	Radius 5
+	States
+	{
+		Spawn:
+			WINT E -1
+	}
+}
+
+actor Wintertree5Big : Wintertree5Huge
+{
+	scale 1
+	Height 70
+	Radius 5
+}
+
+actor Wintertree5Medium : Wintertree5Huge
+{
+	scale .9
+	Height 60
+	Radius 4
+}
+
+actor Wintertree5Small : Wintertree5Huge
+{
+	scale .8
+	Height 50
+	Radius 4
+}
+
+/*
+** -----------------------------------------------------------------------------
+** Winter tree 6
+** -----------------------------------------------------------------------------
+*/
+
+actor Wintertree6Huge : Tree
+{
+	scale 1.5
+	Height 175
+	Radius 6
+	States
+	{
+		Spawn:
+			WINT F -1
+	}
+}
+
+actor Wintertree6Big : Wintertree6Huge
+{
+	scale 1.4
+	Height 165
+	Radius 6
+}
+
+actor Wintertree6Medium : Wintertree6Huge
+{
+	scale 1.2
+	Height 140
+	Radius 4
+}
+
+actor Wintertree6Small : Wintertree6Huge
+{
+	scale 1
+	Height 120
+	Radius 4
+}
+
+/*
+** -----------------------------------------------------------------------------
+** Winter tree 7
+** -----------------------------------------------------------------------------
+*/
+
+actor Wintertree7Huge : Tree
+{
+	scale 1.5
+	Height 190
+	Radius 8
+	States
+	{
+		Spawn:
+			WINT G -1
+	}
+}
+
+actor Wintertree7Big : Wintertree7Huge
+{
+	scale 1.4
+	Height 180
+	Radius 8
+}
+
+actor Wintertree7Medium : Wintertree7Huge
+{
+	scale 1.2
+	Height 160
+	Radius 7
+}
+
+actor Wintertree7Small : Wintertree7Huge
+{
+	scale 1
+	Height 130
+	Radius 7
+}

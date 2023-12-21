@@ -1,0 +1,190 @@
+actor ThrowPower 	 : Ammo { Inventory.MaxAmount 100 }
+actor GrenadeAmmo	 : Ammo { Inventory.MaxAmount 1 }
+
+// Giving this triggers the fire effect.
+actor GrenadeFireTrigger : Trigger
+{
+	States
+	{
+		Pickup:
+            TNT1 A 10 ACS_NamedExecuteAlways("FireGrenadeHit", 0, 0, 0)
+            stop
+	}
+}
+
+
+actor GrenadeSpawn : ZHweaponSpawn 28100
+{
+	radius 10
+	height 8
+	scale 0.6
+	
+	inventory.PickupMessage "Fire grenade"
+	inventory.PickupSound	"decorate/world/item/GET"
+	tag "Grenade"
+	
+	States
+	{
+		Spawn:
+			PGRN A -1
+			
+		Pickup:
+			TNT1 A 0 A_JumpIf(CallACS("CheckTeamIsHuman", 0, 0, 0) == true, "PickupSuccess")
+			stop
+		PickupSuccess:
+			TNT1 A 0 A_GiveInventory("FireGrenade", 1)
+			stop
+	}
+}
+
+actor FireGrenade : ZHWeapon
+{
+	weapon.PreferredSkin "grenade"
+	weapon.SlotNumber	 1
+	Weapon.SlotPriority  0
+	weapon.AmmoType		 "GrenadeAmmo"
+	weapon.AmmoGive		 1
+	weapon.AmmoUse		 1
+	weapon.AmmoType2	 "throwpower"
+	tag					 "Fire grenade"
+	
+	+WEAPON.NOAUTOAIM
+
+	States
+	{
+		// Ready state
+		Ready:
+			TNT1 A 0 A_JumpIfNoAmmo("Ready.NoAmmo")
+			HNGR A 1 A_WeaponReady(WRF_NOSECONDARY)
+			Loop
+			
+		Ready.NoAmmo:
+			TNT1 A 0 A_JumpIfInventory("GrenadeAmmo", 1, "Select.Anim")
+			TNT1 A 1 A_WeaponReady(WRF_NOFIRE)
+			Loop
+			
+		// Select state
+		Select:
+			TNT1 A 0 A_Raise
+		Select.DetermineAmmo:
+			TNT1 A 0 A_TakeInventory("ThrowPower", 999)
+			TNT1 A 0 A_JumpIfNoAmmo("Ready.NoAmmo")
+		Select.Anim:
+			HNGS ABCD 1 A_WeaponReady(WRF_NOFIRE|WRF_NOSWITCH)
+			goto Ready
+		
+		// Deselect state
+		Deselect:
+			TNT1 A 0 A_JumpIfNoAmmo("Deselect.Rest")
+			HNGS DCBA 1
+		Deselect.Rest:
+			TNT1 A 0 A_Lower
+			wait
+		
+		// Fire state
+		Fire:
+			// Failsafe and also just a way to prevent damaging after the round ended.
+			TNT1 A 0 A_JumpIf(CallACS("ScriptGameStateIsEnding", 0, 0, 0) == true, "Ready")
+			
+			HNGR BBCC 1  A_WeaponReady(WRF_NOFIRE|WRF_NOSWITCH)
+			HNGR EEEE 1 A_WeaponReady(WRF_NOFIRE|WRF_NOSWITCH)
+			TNT1 A 0 A_PlaySoundEx("weapons/grenade/PINOUT","SoundSlot5")
+			HNGR FFGGHHII 1 A_WeaponReady(WRF_NOFIRE|WRF_NOSWITCH)
+			HNGR JJJ 3 A_WeaponReady(WRF_NOFIRE|WRF_NOSWITCH)
+			goto Fire.Hold
+		
+		// Altfire, repin state
+		AltFire:
+			TNT1 A 0 A_TakeInventory("ThrowPower", 999)
+			HNGR JJJ 1 A_WeaponReady(WRF_NOFIRE|WRF_NOSWITCH)
+			HNGR IIHHGGFF 1 A_WeaponReady(WRF_NOFIRE|WRF_NOSWITCH)
+			HNGR EE 1 A_WeaponReady(WRF_NOFIRE|WRF_NOSWITCH)
+			TNT1 A 0 A_PlaySound("weapons/grenade/REPIN")
+			HNGR EEECCCBBB 1 A_WeaponReady(WRF_NOFIRE|WRF_NOSWITCH)
+			Goto Ready
+		
+		// Hold state
+		Fire.Hold:
+			// Failsafe. Repin nade if round ended.
+			TNT1 A 0 A_JumpIf(CallACS("ScriptGameStateIsEnding", 0, 0, 0) == true, "AltFire")
+			
+			TNT1 A 0 A_JumpIfInventory("ThrowPower", 100, "Throw")
+			TNT1 A 0 A_GiveInventory("ThrowPower",1)
+			TNT1 A 1 A_WeaponReady(WRF_NOPRIMARY|WRF_NOSECONDARY|WRF_NOSWITCH)
+			TNT1 A 0 A_ReFire("Fire.Hold")
+			
+			// Repins with altfire
+			TNT1 A 0 A_WeaponReady(WRF_NOPRIMARY|WRF_NOSWITCH)
+			
+			HNGR KKLL 1
+			TNT1 A 0 A_PlaySound("weapons/grenade/THROW")
+			Goto Throw
+		
+		// Throw is determined on throwpower
+		Throw:
+			TNT1 A 0 A_JumpIfInventory("ThrowPower", 60, 5)
+			TNT1 A 0 A_JumpIfInventory("ThrowPower", 40, 5)
+			TNT1 A 0 A_JumpIfInventory("ThrowPower", 25, 5)
+			TNT1 A 0 A_JumpIfInventory("ThrowPower", 15, 5)
+			TNT1 A 0 A_JumpIfInventory("ThrowPower", 5,  5)
+			goto Throw+10
+			TNT1 A 0 A_FireCustomMissile("ThrownNade6")
+			goto ThrowEnd
+			TNT1 A 0 A_FireCustomMissile("ThrownNade5")
+			goto ThrowEnd
+			TNT1 A 0 A_FireCustomMissile("ThrownNade4")
+			goto ThrowEnd
+			TNT1 A 0 A_FireCustomMissile("ThrownNade3")
+			goto ThrowEnd
+			TNT1 A 0 A_FireCustomMissile("ThrownNade2")
+			goto ThrowEnd
+			TNT1 A 0 A_FireCustomMissile("ThrownNade1")
+		
+		ThrowEnd:
+			TNT1 A 0 A_TakeInventory("ThrowPower", 999)
+			HNGR MMNN 1
+			TNT1 AAAA 1
+			Goto Select.DetermineAmmo
+	}
+}
+
+actor ThrownNadebase
+{
+	projectile
+	
+	radius 8
+	height 8
+	scale 0.2
+	gravity 0.4
+	
+	bouncefactor 0.4
+	wallBounceFactor 0.2
+	bouncecount 2
+	bounceType Hexen
+	
+	deathSound "weapons/grenade/EXPLODE"
+	bouncesound "weapons/grenade/BOUNCE"
+	
+	-NOGRAVITY
+	+FORCEXYBILLBOARD
+
+	States
+	{
+		Spawn:
+			HGRN AABBCCDDEEFFGGHHIIJJKKLL 1
+			loop
+			
+		Death:
+			TNT1 A 0 A_SpawnItemEx("GrenadeExplosion")
+			TNT1 A 0 A_RadiusGive("GrenadeFireTrigger", 200, RGF_PLAYERS | /*RGF_MONSTERS | RGF_OBJECTS | */RGF_GIVESELF)
+			TNT1 A 0 A_AlertMonsters
+			Stop
+	}
+}
+
+ACTOR ThrownNade6 : ThrownNadebase { Speed 40 }
+ACTOR ThrownNade5 : ThrownNadebase { Speed 35 }
+ACTOR ThrownNade4 : ThrownNadebase { Speed 30 }
+ACTOR ThrownNade3 : ThrownNadebase { Speed 25 }
+ACTOR ThrownNade2 : ThrownNadebase { Speed 20 }
+ACTOR ThrownNade1 : ThrownNadebase { Speed 15 }

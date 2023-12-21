@@ -1,0 +1,59 @@
+
+#define TICTOSECOND 2.85714285714
+
+// Tics formatting. Allows for a prettified display of tics.
+function str FormatTics (int time, bool decimals)
+{
+	// Add one second to seconds if decimals are disabled.
+	// If time is exactly 0, don't.
+	if (!decimals && time != 0) {
+		time += 35;
+	}
+	
+	// Get each value.
+	int hoursInt = (time / 35) / 3600;
+	int minutesInt = (time / 35) / 60 % 60;
+	int secondsInt = (time / 35) % 60;
+	
+	// Hours. If there's none, do not display it.
+	str hours = hours ?
+		StrParam(d:hoursInt, s:":") :
+		"";
+
+	// Add leading zeroes if we display hours.
+	str minutes = hoursInt ?
+		AddLeadingZero(minutesInt, 2) :
+		StrParam(d:minutesInt);
+		
+	if (!minutesInt && !hoursInt && decimals) {
+		minutes = "";
+	}
+	else {
+		minutes = StrParam(s:minutes, s:":");
+	}
+
+	// Seconds. Always add leading zeroes to seconds
+	str seconds = AddLeadingZero(secondsInt, 2);
+
+	// Full time
+	str fullTime = StrParam(s:hours, s:minutes, s:seconds);
+
+	// No decimals added
+	if (!decimals) {
+		return fullTime;
+	}
+
+	// Decimals. Makes sure a tic is properly shown as a full second,
+	// and round to one decimal, while making sure it's parsed properly.
+	str decimalsStr = StrParam(d:FixedMul(time % 35, TICTOSECOND));
+	if (StrLen(decimalsStr) != 1) {
+		decimalsStr = StrLeft(decimalsStr, StrLen(decimalsStr) - 1);
+	}
+	else {
+		decimalsStr = "0";
+	}
+
+	fullTime = StrParam(s:fullTime, s:".", s:decimalsStr);
+
+	return fullTime;
+}

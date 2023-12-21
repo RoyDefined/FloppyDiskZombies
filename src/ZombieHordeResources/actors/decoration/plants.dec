@@ -1,0 +1,10 @@
+
+actor Plantpot : Plant 10544
+{
+	tag "Plant pot"
+	States
+	{
+		Spawn:
+			TRE6 A -1
+	}
+}

@@ -1,0 +1,48 @@
+actor BRAN11 20026
+{
+	//$Category "Zombie Horde Decoration"
+	//$NotAngled
+	
+	height 28
+	radius 14
+	+SOLID
+	
+	states
+	{
+		Spawn:
+			BRA1 A -1
+			Stop
+	}
+}
+actor BRAN12 20027
+{
+	//$Category "Zombie Horde Decoration"
+	//$NotAngled
+	
+	height 28
+	radius 14
+	+SOLID
+	
+	states
+	{
+		Spawn:
+			BRA2 A -1
+			Stop
+	}
+}
+actor BRAN13 20028
+{
+	//$Category "Zombie Horde Decoration"
+	//$NotAngled
+	
+	height 28
+	radius 14
+	+SOLID
+	
+	states
+	{
+		Spawn:
+			BRA3 A -1
+			Stop
+	}
+}

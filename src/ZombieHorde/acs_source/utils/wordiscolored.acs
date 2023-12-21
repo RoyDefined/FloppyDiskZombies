@@ -1,0 +1,47 @@
+function bool WordIsColored(str sentence, str word)
+{
+	int i = StrFind(sentence, word);
+	if (i == -1) {
+		return false;
+	}
+
+	i--;
+	while (i >= 0 && isspace(GetChar(sentence, i))) {
+		i--;
+	}
+	if (i < 0) {
+		return false;
+	}
+
+	if (GetChar(sentence, i) == ']')
+	{
+		while (GetChar(sentence, i) != '[' && i >= 0) {
+			i--;
+		}
+	}
+	else if (IsColorCodeChar(GetChar(sentence, i)))
+	{
+		i--;
+	}
+
+	if (i < 0) {
+		return false;
+	}
+
+	if (GetChar(sentence, i) == 28) {
+		return true;
+	}
+	else if (GetChar(sentence, i) != 'c') {
+		return false;
+	}
+
+	i--;
+	if (i < 0) {
+		return false;
+	}
+	if (GetChar(sentence, i) == '\\') {
+		return true;
+	}
+
+	return false;
+}

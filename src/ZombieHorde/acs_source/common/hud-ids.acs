@@ -1,0 +1,7 @@
+// Uses both 151 and 152 for messages.
+#define HUDID_RESIST 151
+#define HUDID_SNIPER 153
+#define HUDID_SCRATCH 154
+
+// Can have multiple ids bound to it. Timer uses 159 and 160 for example.
+#define HUDID_BOTTOM 160

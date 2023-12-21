@@ -1,13 +1,23 @@
+// @public
 function bool PlayerTeamIsNone(int id)   { return gameContext.players[id].type == none; }
+// @public
 function bool PlayerTeamIsHuman(int id)  { return gameContext.players[id].type == human; }
+// @public
 function bool PlayerTeamIsZombie(int id) { return gameContext.players[id].type == zombie; }
+// @public
 function bool TeamIsNone(void)   		 { return PlayerTeamIsNone(PlayerNumber()); }
+// @public
 function bool TeamIsHuman(void)  		 { return PlayerTeamIsHuman(PlayerNumber()); }
+// @public
 function bool TeamIsZombie(void) 		 { return PlayerTeamIsZombie(PlayerNumber()); }
+// @public
 script "CheckTeamIsNone"(void)   		 { SetResultValue(TeamIsNone()); }
+// @public
 script "CheckTeamIsHuman"(void)  		 { SetResultValue(TeamIsHuman()); }
+// @public
 script "CheckTeamIsZombie"(void) 		 { SetResultValue(TeamIsZombie()); }
 
+// @public
 script "CheckTargetTeamIsNone"(void)
 {
 	if (!SetActivatorToTarget(0))
@@ -19,6 +29,7 @@ script "CheckTargetTeamIsNone"(void)
 	SetResultValue(TeamIsNone());
 }
 
+// @public
 script "CheckTargetTeamIsHuman"(void)
 {
 	if (!SetActivatorToTarget(0))
@@ -30,6 +41,7 @@ script "CheckTargetTeamIsHuman"(void)
 	SetResultValue(TeamIsHuman());
 }
 
+// @public
 script "CheckTargetTeamIsZombie"(void)
 {
 	if (!SetActivatorToTarget(0))
@@ -42,6 +54,7 @@ script "CheckTargetTeamIsZombie"(void)
 }
 
 
+// @public
 function void LogMessageToHumans(str message)
 {
 	for (int i = 0; i < MAX_PLAYERS; ++i)
@@ -54,6 +67,7 @@ function void LogMessageToHumans(str message)
 	}
 }
 
+// @public
 function void LogMessageToZombies(str message)
 {
 	for (int i = 0; i < MAX_PLAYERS; ++i)
@@ -66,6 +80,7 @@ function void LogMessageToZombies(str message)
 	}
 }
 
+// @public
 function int HumanCount(void)
 {
 	int count;
@@ -81,6 +96,7 @@ function int HumanCount(void)
 	return count;
 }
 
+// @public
 function int ZombieCount(void)
 {
 	int count;
@@ -121,6 +137,7 @@ function void ResetSettings(void)
 	TakeInventory("SniperZoomlevel", 2);
 }
 
+// @public
 function void SetInitialZombieHealth(int health)
 {
 	if (GameStateIsPlaying() || GameStateIsEnding())
@@ -138,6 +155,7 @@ function void SetInitialZombieHealth(int health)
 	gameContext.initialZombieHealth = health;
 }
 
+// @public
 function void SetSecondaryZombieHealth(int health)
 {
 	if (GameStateIsPlaying() || GameStateIsEnding())

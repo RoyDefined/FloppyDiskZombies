@@ -8,7 +8,6 @@
 
 #include "utils/wordiscolored.acs"
 #include "utils/formattics.acs"
-#include "utils/advancedteleport.acs"
 
 #include "common/common.acs"
 #include "common/hud-ids.acs"

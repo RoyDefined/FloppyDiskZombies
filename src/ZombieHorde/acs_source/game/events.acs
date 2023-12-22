@@ -1,3 +1,33 @@
+// These cvars are set on map load to determine if they must be set manually.
+// When the map unloads, these cvars are unset to restore the original context.
+bool _shootThroughAlliesCvarEnabled;
+bool _clientSendFullButtonInfoCvarEnabled;
+
+script "OnOpen" open
+{
+	_shootThroughAlliesCvarEnabled = GetCvar("sv_shootthroughallies");
+	_clientSendFullButtonInfoCvarEnabled = GetCvar("compat_clientssendfullbuttoninfo");
+	
+	if (!_shootThroughAlliesCvarEnabled) {
+		SetGameplaySetting("sv_shootthroughallies", true);
+	}
+	
+	if (!_clientSendFullButtonInfoCvarEnabled) {
+		SetGameplaySetting("compat_clientssendfullbuttoninfo", true);
+	}
+}
+
+script "OnUnloading" unloading
+{
+	if (!_shootThroughAlliesCvarEnabled) {
+		SetGameplaySetting("sv_shootthroughallies", false);
+	}
+	
+	if (!_clientSendFullButtonInfoCvarEnabled) {
+		SetGameplaySetting("compat_clientssendfullbuttoninfo", false);
+	}
+}
+
 script "OnEnter" enter
 {
 	AssignPlayerTID();

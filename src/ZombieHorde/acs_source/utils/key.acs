@@ -1,0 +1,13 @@
+// @public
+// @summary Returns `true` if the activator is moving. This function requires `compat_clientssendfullbuttoninfo` to be enabled.
+function bool IsMoving (void)
+{
+	return KeyDownAny(BT_FORWARD | BT_BACK | BT_MOVELEFT | BT_MOVERIGHT);
+}
+
+// @public
+// @summary Returns `true` if the player with the given id is moving. This function requires `compat_clientssendfullbuttoninfo` to be enabled.
+function bool PlayerIsMoving (int id)
+{
+	return PlayerKeyDownAny(id, BT_FORWARD | BT_BACK | BT_MOVELEFT | BT_MOVERIGHT);
+}

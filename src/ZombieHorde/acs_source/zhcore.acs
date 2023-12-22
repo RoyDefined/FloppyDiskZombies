@@ -6,6 +6,7 @@
 
 #include "zcommon.acs"
 
+#include "utils/key.acs"
 #include "utils/wordiscolored.acs"
 #include "utils/formattics.acs"
 

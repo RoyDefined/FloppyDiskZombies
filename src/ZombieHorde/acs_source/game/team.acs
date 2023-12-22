@@ -305,6 +305,10 @@ function void Infect(int infector, int infected)
 	if (!NamedExecuteClientScript("ZombieScratch", PlayerNumber())) {
 		LogError(StrParam(s:"Zombie scratch effect failed for ", s:PlayerName(PlayerNumber()), s:"."));
 	}
+	
+	if (!NamedExecuteClientScript("ScriptClientZombieDrawInfectionFire", infected)) {
+		LogError(StrParam(s:"Could not call ScriptClientZombieDrawInfectionFire for ", s:infectedName, s:" (", d:infected, s:")."));
+	}
 }
 
 function void RemovePlayer(int id)
@@ -428,6 +432,18 @@ script "BurnActivator"(void)
 				LogWarning(StrParam(s:"Failed to spawn burning effect for ", s:PlayerName(PlayerNumber()), s:"."));
 			}
 		}
+		
+		if (Timer() % 2 == 0)
+		{
+			fixed x = GetActorX(0) + (Random(-15, 15) << 16),
+			  y = GetActorY(0) + (Random(-15, 15) << 16),
+			  z = GetActorZ(0) + GetActorViewHeight(ActivatorTID()) * (0.1 * (Random(0, 9) << 16));
+			if (!SpawnForced("BurningEffect", x, y, z)) {
+				LogWarning(StrParam(s:"Failed to spawn burning effect for ", s:PlayerName(PlayerNumber()), s:"."));
+			}
+		}
+		
+		DrawFire(FIRETYPENORMAL);
 		
 		if (Timer() % 10 == 0) {
 			DamageThing(10);

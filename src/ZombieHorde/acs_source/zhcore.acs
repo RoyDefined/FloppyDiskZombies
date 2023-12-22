@@ -16,6 +16,7 @@
 #include "game/state.acs"
 #include "game/timer.acs"
 #include "game/identity.acs"
+#include "game/player.acs"
 #include "game/team.acs"
 #include "game/map.acs"
 #include "game/resist.acs"

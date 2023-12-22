@@ -72,7 +72,7 @@ script "DrawMapInfo" (void) clientside
 	
 	SetHudSize(960, 600, TRUE);
 	SetFont("BigFont");
-	HudMessage(s:"\cgZombie Horde \cj- ", s:levelName; HUDMSG_TYPEON, 0, CR_UNTRANSLATED, mapInfoHorizontal, mapInfoVertical, 6.0, 0.05, 0.5);
+	HudMessage(s:"\cgZombie Horde Lite \cj- ", s:levelName; HUDMSG_TYPEON, 0, CR_UNTRANSLATED, mapInfoHorizontal, mapInfoVertical, 6.0, 0.05, 0.5);
 	
 	delay(35*2);
 	

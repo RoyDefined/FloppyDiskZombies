@@ -201,14 +201,8 @@ function void SetHuman(int id)
 		LogError(StrParam(s:"Failed to morph ", s:PlayerName(id), s:" into a human (class = ", s:class, s:")."));
 		terminate;
 	}
-	
-#ifdef dev
-	bool noBroadcastTeamChange = false;
-#else
-	bool noBroadcastTeamChange = true;
-#endif
 
-	if (!Player_SetTeam(TEAM_BLUE, noBroadcastTeamChange)) {
+	if (!Player_SetTeam(TEAM_BLUE, true)) {
 		LogError(StrParam(s:"Failed to set team of ", s:PlayerName(id), s:" into blue."));
 		terminate;
 	}
@@ -244,13 +238,7 @@ function void SetZombie(int id)
 		terminate;
 	}	
 	
-#ifdef dev
-	bool noBroadcastTeamChange = false;
-#else
-	bool noBroadcastTeamChange = true;
-#endif
-	
-	if (!Player_SetTeam(TEAM_RED, noBroadcastTeamChange)) {
+	if (!Player_SetTeam(TEAM_RED, true)) {
 		LogError(StrParam(s:"Failed to set team of ", s:PlayerName(id), s:" into red."));
 		terminate;
 	}
@@ -390,7 +378,7 @@ script "ZombieMeleeHit"(void)
 	}
 	
 	if (!SetActivatorToTarget(0)) {
-		LogError("Failed to find target during melee hit.");
+		//LogError("Failed to find target during melee hit.");
 		terminate;
 	}
 	

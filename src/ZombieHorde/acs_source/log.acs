@@ -29,6 +29,11 @@ enum LogSeverityT {
 	severityNone,
 };
 
+function bool ShouldShowDebugMessages(void)
+{
+	return !IsNetworkGame() || GetCvar(SERVERSHOWDEBUGMESSAGESCVAR);
+}
+
 function LogSeverityT GetShownLogSeverity(void)
 {
 	int severity = GetCvar(CLIENTLOGSEVERITYCVAR);
@@ -59,6 +64,10 @@ function void LogSeverity(str message, LogSeverityT severity)
 	
 	if (IsServerOnly())
 	{
+		if (severity == severityDebug && !ShouldShowDebugMessages()) {
+			return;
+		}
+		
 		// Log to server
 		Log(s:formatted);
 	}
@@ -201,7 +210,7 @@ function void LogClient(str message)
 		int severityChar = GetChar(message, 1);
 	
 		// Do not show debug messages online if the cvar is not enabled for it.
-		if (IsNetworkGame() && !GetCvar(SERVERSHOWDEBUGMESSAGESCVAR) && severityChar == severityDebug) {
+		if (severityChar == severityDebug && !ShouldShowDebugMessages()) {
 			return;
 		}
 		

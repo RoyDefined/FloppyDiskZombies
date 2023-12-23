@@ -368,6 +368,28 @@ function void SelectInitials(void)
 	LogDebug(StrParam(s:message, s:zombieChooseCount > 1 ? " have " : " has ", s:"been chosen as the initial zombie", s:zombieChooseCount > 1 ? "s." : "."));
 }
 
+// This function adds time depending on the number of zombies infected.
+function void AddInfectionTimerTime(void)
+{
+	static int infectedCount;
+	
+	// Check if the gamestate is playing.
+	// This should only happen offline unless people somehow manage to infect eachother outside the main play time.
+	if (!GameStateIsPlaying()) {
+		return;
+	}
+	
+	// Check if there are even humans left to continue the game.
+	if (HumanCount() == 0) {
+		return;
+	}
+	
+	// Added time starts at 90, and with each concurrent infect is 15 seconds less.
+	// When 10 or below, it will remain at 10 for the remaining concurrent infects.
+	int time = Max(0, 90 - 15 * infectedCount) + 10 * Clamp(infectedCount / 6, 0, 1);
+	AddPlayingTimer(35 * time);
+}
+
 script "ZombieMeleeHit"(void)
 {
 	int infectedTID = GetActorProperty(0, APROP_TRACERTID);

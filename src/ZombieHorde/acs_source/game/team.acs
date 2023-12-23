@@ -453,8 +453,6 @@ script "BurnActivator"(void)
 			}
 		}
 		
-		DrawFire(FIRETYPENORMAL);
-		
 		if (Timer() % 10 == 0) {
 			DamageThing(10);
 		}

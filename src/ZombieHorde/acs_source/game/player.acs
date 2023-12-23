@@ -12,6 +12,29 @@
 // Indicates how many distinct fire sprites should be drawn on the player's screen when infected.
 #define INFECTIONFIREDRAWCOUNT 15
 
+script "ClientsideLoop" clientside
+{
+	while(true)
+	{
+		// This constantly runs to ensure the right activator is set.
+		if (!SetActivatorToPlayer(ConsolePlayerNumber())) {
+			LogError("Could not set activator to console player.");
+			terminate;
+		}
+		
+		if (PlayerIsBot(PlayerNumber())) {
+			return;
+		}
+	
+		if (CheckInventory("BurningDamage"))
+		{
+			DrawFire(FIRETYPENORMAL);
+		}
+		
+		Delay(const: 1);
+	}
+}
+
 script "ScriptClientZombieDrawInfectionFire" (int type) clientside
 {
 	for (int i = 0; i < INFECTIONFIREDRAWCOUNT; ++i)
@@ -25,6 +48,7 @@ function void DrawFire(int type)
 {
 	if (!IsClient()) {
 		LogError("DrawFire must be called clientside.");
+		return;
 	}
 	
 	// Do not draw for bots.

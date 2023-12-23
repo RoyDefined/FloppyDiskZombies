@@ -60,6 +60,10 @@ script "OnEnter" enter
 script "ClientOpen" open clientside
 {
 	ACS_NamedExecute("DrawMapInfo", 0);
+	
+	if (!ACS_NamedExecute("ClientsideLoop", 0)) {
+		LogError("Client player loop could not be started.");
+	}
 }
 
 script "OnDisconnect" (int id) disconnect

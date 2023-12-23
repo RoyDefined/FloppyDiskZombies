@@ -62,6 +62,7 @@ actor PlayerSpeedModifier : PowerSpeed
 actor WeaponStateFiring : Boolean {}
 
 #include "actors/abstractitem.dec"
+#include "actors/weather.dec"
 
 #include "actors/debug/player/zombie.dec"
 

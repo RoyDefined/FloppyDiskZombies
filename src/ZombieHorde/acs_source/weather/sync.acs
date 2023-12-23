@@ -1,0 +1,125 @@
+enum
+{
+	// The number of packets used for one weather iteration.
+	weatherPacketCount = 6,
+};
+
+enum
+{
+	// The TID used during the synching of the weather.
+	// One weather type uses 6 TIDs.
+	// First is a pack of index, weather type, active and outside.
+	// The remaining consist of severity, minRadius, maxRadius, minZpos and maxZpos.
+	SYNC_WEATHER = 1200,
+};
+
+// Synchronises the weather to all players. WeatherIndex specifies what the index is to send.
+function void SyncWeather(int weatherIndex)
+{
+	if (!IsServer()) {
+		LogError("SyncWeather was called clientside.");
+		return;
+	}
+	
+	// Do not sync when not in a network game.
+	if (!IsNetworkGame()) {
+		return;
+	}
+	
+	if (!WeatherisSet(weatherIndex)) {
+		LogWarning(StrParam(s:"Unable to send weather under index ", d:weatherIndex, s:", no weather is set."));
+		return;
+	}
+	
+	WeatherTypeT type = _weatherContexts[weatherIndex].type;
+	bool active = _weatherContexts[weatherIndex].active;
+	bool outside = _weatherContexts[weatherIndex].outside;
+	bool inside = _weatherContexts[weatherIndex].inside;
+	int intensity = _weatherContexts[weatherIndex].intensity;
+	int minRadius = _weatherContexts[weatherIndex].minRadius;
+	int maxRadius = _weatherContexts[weatherIndex].maxRadius;
+	int minZpos = _weatherContexts[weatherIndex].minZpos;
+	int maxZpos = _weatherContexts[weatherIndex].maxZpos;
+	
+	// This is a failsafe, should `weatherIndex` or `type` ever exceed the max size of a byte somehow.
+	if (weatherIndex > 255) {
+		LogError(StrParam(s:"Weather index exceeds maximum size of a byte (", d:weatherIndex, s:")."));
+		return;
+	}
+	
+	if (type > 255) {
+		LogError(StrParam(s:"Weather type exceeds maximum size of a byte (", d:type, s:")."));
+		return;
+	}
+	
+	LogDebug(StrParam(s:"Start synching weather ", d:weatherIndex, s:" to clients. Type: ", d:type, s:", active: ", s:(active ? "true" : "false")));
+
+	int pack = PackBytes(type, active, outside, inside);
+	
+	SyncVariable(SYNC_WEATHER + (weatherIndex * weatherPacketCount), pack);
+	
+	SyncVariable(SYNC_WEATHER + 1 + (weatherIndex * weatherPacketCount), intensity);
+	SyncVariable(SYNC_WEATHER + 2 + (weatherIndex * weatherPacketCount), minRadius);
+	SyncVariable(SYNC_WEATHER + 3 + (weatherIndex * weatherPacketCount), maxRadius);
+	SyncVariable(SYNC_WEATHER + 4 + (weatherIndex * weatherPacketCount), minZpos);
+	SyncVariable(SYNC_WEATHER + 5 + (weatherIndex * weatherPacketCount), maxZpos);
+	
+	// Receive on all clients.
+	if (!ACS_NamedExecuteAlways("SyncWeather_Client", 0, weatherIndex)) {
+		LogError("Failed to execute SyncWeather_Client.");
+	}
+}
+
+script "SyncWeather_Client" (int weatherIndex) clientside
+{
+	ClientSyncWeather(weatherIndex);
+}
+
+// Called clientside to fetch the synced state.
+function void ClientSyncWeather(int weatherIndex)
+{
+	if (!IsClient()) {
+		LogError("ClientSyncWeather was called serverside.");
+		return;
+	}
+	
+	// Do not sync when not in a network game.
+	if (!IsNetworkGame()) {
+		return;
+	}
+	
+	if (weatherIndex >= maxWeather) {
+		LogError(StrParam(s:"Weather index is out of bounds (", d:weatherIndex, s:" >= ", s:maxWeather, s:")."));
+		return;
+	}
+	
+	int pack = GetSyncVarDefault(SYNC_WEATHER + (weatherIndex * weatherPacketCount), 0);
+	int weatherTypeInt = UnpackByte1(pack);
+	bool active = UnpackByte2(pack);
+	bool outside = UnpackByte3(pack);
+	bool inside = UnpackByte4(pack);
+	
+	int intensity = GetSyncVarDefault(SYNC_WEATHER + 1 + (weatherIndex * weatherPacketCount), 0);
+	int minRadius = GetSyncVarDefault(SYNC_WEATHER + 2 + (weatherIndex * weatherPacketCount), 0);
+	int maxRadius = GetSyncVarDefault(SYNC_WEATHER + 3 + (weatherIndex * weatherPacketCount), 0);
+	int minZpos = GetSyncVarDefault(SYNC_WEATHER + 4 + (weatherIndex * weatherPacketCount), 0);
+	int maxZpos = GetSyncVarDefault(SYNC_WEATHER + 5 + (weatherIndex * weatherPacketCount), 0);
+	
+	// Assume weather is not set if none.
+	// @todo No error is send because new clients sync all weather, checking this value. I should change this.
+	if (weatherTypeInt == 0) {
+		return;
+	}
+	
+	LogDebug(StrParam(s:"Synced weather ", d:weatherIndex, s:"."));
+	
+	_weatherContexts[weatherIndex].type = IntToWeatherType(weatherTypeInt);
+	_weatherContexts[weatherIndex].active = active;
+	_weatherContexts[weatherIndex].outside = outside;
+	_weatherContexts[weatherIndex].inside = inside;
+	_weatherContexts[weatherIndex].intensity = intensity;
+	_weatherContexts[weatherIndex].minRadius = minRadius;
+	_weatherContexts[weatherIndex].maxRadius = maxRadius;
+	_weatherContexts[weatherIndex].minZpos = minZpos;
+	_weatherContexts[weatherIndex].maxZpos = maxZpos;
+}

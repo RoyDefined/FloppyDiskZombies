@@ -1,0 +1,32 @@
+// Called after initial client connect.
+script "ClientOpenWeather" (void) open clientside
+{
+	for (int i = 0; i < MaxWeather; ++i)
+	{
+		ClientSyncWeather(i);
+	}
+	
+	if (!ACS_NamedExecute("ClientsideLoopWeather", 0)) {
+		LogError("Client player loop could not be started.");
+	}
+}
+
+script "ClientsideLoopWeather" clientside
+{
+	while(true)
+	{
+		// This constantly runs to ensure the right activator is set.
+		if (!SetActivatorToPlayer(ConsolePlayerNumber())) {
+			LogError("Could not set activator to console player.");
+			terminate;
+		}
+		
+		if (PlayerIsBot(PlayerNumber())) {
+			return;
+		}
+	
+		WeatherTicClient();
+		
+		Delay(const: 1);
+	}
+}

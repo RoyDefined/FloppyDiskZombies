@@ -1,0 +1,187 @@
+/*
+ * Behaviour for weather.
+ */
+
+struct WeatherContextT
+{
+	int type;
+	
+	// If `true`, the weather is active and should spawn on the map.
+	bool active;
+	
+	// If `true`, the weather can spawn in sectors with an `F_SKY1` ceiling.
+	bool outside;
+	
+	// If `true`, the weather can spawn in sectors without an `F_SKY1` ceiling.
+	bool inside;
+	
+	int intensity,
+		minRadius,
+		maxRadius,
+		minZpos,
+		maxZpos;
+};
+
+enum WeatherTypeT
+{
+	weatherTypeNone,
+	weatherTypeDebug,
+	weatherTypeRain,
+	weatherTypeSnow,
+	weatherTypeDust,
+	weatherTypeSpark,
+};
+
+enum
+{
+	// Maximum number of weather types allowed.
+	MAXWEATHER = 5,
+};
+
+// Holds all weather contexts.
+WeatherContextT _weatherContexts[MAXWEATHER];
+
+//@public
+//@summary Sets the weather under the given index. If called clientside the weather will only be added on the client.
+function void SetWeather(int weatherIndex, int weatherType, bool outside, bool inside, int intensity, int minRadius, int maxRadius, int minZpos, int maxZpos)
+{
+	if (weatherIndex >= MAXWEATHER) {
+		LogError("Weather index is out of bounds.");
+		return;
+	}
+	
+	_weatherContexts[weatherIndex].type = weatherType;
+	_weatherContexts[weatherIndex].outside = outside;
+	_weatherContexts[weatherIndex].inside = inside;
+	_weatherContexts[weatherIndex].intensity = intensity;
+	_weatherContexts[weatherIndex].minRadius = minRadius;
+	_weatherContexts[weatherIndex].maxRadius = maxRadius;
+	_weatherContexts[weatherIndex].minZpos = minZpos;
+	_weatherContexts[weatherIndex].maxZpos = maxZpos;
+	
+	// Sync to clients.
+	if (IsServerOnly())
+	{
+		SyncWeather(weatherIndex);
+	}
+}
+
+//@public
+//@summary Starts the weather specified with the given index. If called clientside it will start the weather for this client.
+function void StartWeather(int weatherIndex)
+{
+	if (weatherIndex >= MAXWEATHER) {
+		LogError("Weather index is out of bounds.");
+		return;
+	}
+	
+	if (!WeatherisSet(weatherIndex)) {
+		LogWarning("No weather defined under index.");
+		return;
+	}
+	
+	if (_weatherContexts[weatherIndex].active) {
+		return;
+	}
+	
+	_weatherContexts[weatherIndex].active = true;
+	
+	// Sync to clients.
+	if (IsServerOnly())
+	{
+		SyncWeather(weatherIndex);
+	}
+}
+
+//@public
+//@summary Stops the weather specified with the given index. If called clientside it will stop the weather for this client.
+function void StopWeather(int weatherIndex)
+{
+	if (weatherIndex >= MAXWEATHER) {
+		LogError("Weather index is out of bounds.");
+		return;
+	}
+	
+	if (!WeatherisSet(weatherIndex)) {
+		LogWarning("No weather defined under index.");
+		return;
+	}
+	
+	if (!_weatherContexts[weatherIndex].active) {
+		return;
+	}
+	
+	_weatherContexts[weatherIndex].active = false;
+	
+	// Sync to clients.
+	if (IsServerOnly())
+	{
+		SyncWeather(weatherIndex);
+	}
+}
+
+//@public
+//@summary Returns `true` if weather is defined under the given index.
+function bool WeatherisSet(int weatherIndex)
+{
+	if (weatherIndex >= MAXWEATHER) {
+		LogError("Weather index is out of bounds.");
+		return false;
+	}
+	
+	// Assume it's set if a type is defined.
+	return _weatherContexts[weatherIndex].type != WeatherTypeNone;
+}
+
+function WeatherTypeT IntToWeatherType(int weatherType)
+{
+	static WeatherTypeT weatherTypes[] = { weatherTypeNone, weatherTypeDebug, weatherTypeRain, weatherTypeSnow, weatherTypeDust, weatherTypeSpark, };
+	if (6 < weatherType) {
+		LogError("Unable to get weather type.");
+		return weatherTypeNone;
+	}
+	
+	return weatherTypes[weatherType];
+}
+
+// @public
+// @summary returns the given weather as a string.
+function str WeatherString(WeatherTypeT weatherType)
+{
+	return weatherType == weatherTypeNone ? "none" :
+		   weatherType == weatherTypeDebug ? "debug" :
+		   weatherType == weatherTypeRain ? "rain" :
+		   weatherType == weatherTypeSnow ? "snow" :
+		   weatherType == weatherTypeDust ? "dust" :
+		   weatherType == weatherTypeSpark ? "sparks" :
+		   "unknown";
+}
+
+// @public
+// @summary returns the intensity of the weather under the given index.
+function int GetWeatherIntensity(int weatherIndex)
+{
+	if (weatherIndex >= MAXWEATHER) {
+		LogError("Weather index is out of bounds.");
+		return 0;
+	}
+	
+	return _weatherContexts[weatherIndex].intensity;
+}
+
+// @public
+// @summary sets the intensity of the weather under the given index.
+function void SetWeatherIntensity(int weatherIndex, int intensity)
+{
+	if (weatherIndex >= MAXWEATHER) {
+		LogError("Weather index is out of bounds.");
+		return;
+	}
+	
+	_weatherContexts[weatherIndex].intensity = intensity;
+	
+	// Sync to clients.
+	if (IsServerOnly()) {
+		SyncWeather(weatherIndex);
+	}
+}

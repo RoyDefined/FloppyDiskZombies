@@ -58,6 +58,11 @@ actor PlayerSpeedModifier : PowerSpeed
 	Speed 0.8
 }
 
+// Determines the weapon is firing.
+actor WeaponStateFiring : Boolean {}
+
+#include "actors/abstractitem.dec"
+#include "actors/weather.dec"
 
 #include "actors/debug/player/zombie.dec"
 
@@ -68,5 +73,7 @@ actor PlayerSpeedModifier : PowerSpeed
 #include "actors/weapons/claws.dec"
 #include "actors/weapons/shotgun.dec"
 #include "actors/weapons/sniper.dec"
+#include "actors/weapons/chaingun.dec"
 #include "actors/weapons/grenade.dec"
+#include "actors/weapons/grenadespawn.dec"
 #include "actors/weapons/grenadeeffects.dec"

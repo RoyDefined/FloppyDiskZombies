@@ -12,32 +12,7 @@ actor GrenadeFireTrigger : Trigger
 	}
 }
 
-
-actor GrenadeSpawn : ZHweaponSpawn 28100
-{
-	radius 10
-	height 8
-	scale 0.6
-	
-	inventory.PickupMessage "Fire grenade"
-	inventory.PickupSound	"decorate/world/item/GET"
-	tag "Grenade"
-	
-	States
-	{
-		Spawn:
-			PGRN A -1
-			
-		Pickup:
-			TNT1 A 0 A_JumpIf(CallACS("CheckTeamIsHuman", 0, 0, 0) == true, "PickupSuccess")
-			stop
-		PickupSuccess:
-			TNT1 A 0 A_GiveInventory("FireGrenade", 1)
-			stop
-	}
-}
-
-actor FireGrenade : ZHWeapon
+actor ZHFireGrenade : ZHWeapon
 {
 	weapon.PreferredSkin "grenade"
 	weapon.SlotNumber	 1

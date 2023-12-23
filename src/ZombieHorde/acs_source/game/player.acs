@@ -1,0 +1,90 @@
+// The sprite names for the fire.
+#define FIRESPRITEBASE "FIR1"
+#define INFECTIONFIRESPRITEBASE "IFIR"
+
+// The fire types that can be passed to `DrawFire`.
+#define FIRETYPENORMAL 1
+#define FIRETYPEINFECT 2
+
+// The max number of fire sprites that can be drawn.
+#define MAXFIRESPRITECOUNT 9
+		
+// Indicates how many distinct fire sprites should be drawn on the player's screen when infected.
+#define INFECTIONFIREDRAWCOUNT 15
+
+script "ClientsideLoop" clientside
+{
+	while(true)
+	{
+		// This constantly runs to ensure the right activator is set.
+		if (!SetActivatorToPlayer(ConsolePlayerNumber())) {
+			LogError("Could not set activator to console player.");
+			terminate;
+		}
+		
+		if (PlayerIsBot(PlayerNumber())) {
+			return;
+		}
+	
+		if (CheckInventory("BurningDamage"))
+		{
+			DrawFire(FIRETYPENORMAL);
+		}
+		
+		Delay(const: 1);
+	}
+}
+
+script "ScriptClientZombieDrawInfectionFire" (int type) clientside
+{
+	for (int i = 0; i < INFECTIONFIREDRAWCOUNT; ++i)
+	{
+		DrawFire(FIRETYPEINFECT);
+	}
+}
+
+// Draws a fire graphic on the player's hud.
+function void DrawFire(int type)
+{
+	if (!IsClient()) {
+		LogError("DrawFire must be called clientside.");
+		return;
+	}
+	
+	// Do not draw for bots.
+	if (PlayerIsBot(PlayerNumber())) {
+		return;
+	}
+	
+	if (!ACS_NamedExecuteAlways("ScriptDrawFire", 0, type)) {
+		LogError("Failed to call ScriptDrawFire.");
+	}
+}
+
+// Called from the function above, and it will draw 1 fire sprite on the player's hud, depending on the type passed.
+script "ScriptDrawFire" (int type) clientside
+{
+	int width = 80;
+	int height = 60;
+	SetHudSize(width, height, false);
+	
+	str spriteBase = type == FIRETYPENORMAL ? FIRESPRITEBASE : INFECTIONFIRESPRITEBASE;
+	int x = Random(5, width * 2);
+	int y = height * 2 - Random(15, 30);
+	fixed opacity = 0.1;
+	int frame;
+	while (frame != MAXFIRESPRITECOUNT)
+	{
+		str frameName = StrParam(s:spriteBase, c:('A' + frame), s:"0");
+		SetFont(frameName);
+		
+		HudMessage(s:"a"; HUDMSG_PLAIN | HUDMSG_NOTWITHFULLMAP | HUDMSG_ALPHA, 0, CR_UNTRANSLATED, (x << 16), (y << 16), 0.06, opacity);
+		
+		y -= 1;
+		opacity += 0.05;
+		frame++;
+		
+		delay(2);
+	}
+}
+

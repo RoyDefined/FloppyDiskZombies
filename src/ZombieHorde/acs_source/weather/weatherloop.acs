@@ -1,0 +1,81 @@
+/*
+ * This implements the behaviour of the weather per tic
+ */
+
+// Translation of the weather type into the actual actor name.
+str _weatherStrings[6] = {
+	"", "DebugDrop", "RainDrop", "SnowDrop", "DustParticle", "SparkParticle"
+};
+
+function void WeatherTicClient(void)
+{
+	// Determine the tid the spawn the weather at.
+	// This will allow the weather to work correctly when spectating.
+	int cameraTID = CheckPlayerCamera(PlayerNumber());
+	
+	for (int i = 0; i < MAXWEATHER; ++i)
+	{
+		if (!WeatherisSet(i)) {
+			continue;
+		}
+		
+		if (!_weatherContexts[i].active) {
+			continue;
+		}
+		
+		SpawnWeather(i, cameraTID);
+	}
+}
+
+function void SpawnWeather(int weatherIndex, int tid)
+{
+	WeatherTypeT type = _weatherContexts[weatherIndex].type;
+	bool outside = _weatherContexts[weatherIndex].outside;
+	bool inside = _weatherContexts[weatherIndex].inside;
+	int intensity = _weatherContexts[weatherIndex].intensity;
+	int minRadius = _weatherContexts[weatherIndex].minRadius;
+	int maxRadius = _weatherContexts[weatherIndex].maxRadius;
+	int minZpos = _weatherContexts[weatherIndex].minZpos;
+	int maxZpos = _weatherContexts[weatherIndex].maxZpos;
+	
+	for (int i = 0; i < intensity; ++i)
+	{
+		fixed angle = random(0.0, 1.0),
+			radius = (random(minRadius, maxRadius) << 16);
+		
+		// Determine the position to spawn the weather particle at
+		fixed spotX = GetActorX(tid) + FixedMul(cos(angle), radius),
+			  spotY	= GetActorY(tid) + FixedMul(sin(angle), radius),
+			  spotZ	= GetActorZ(tid) + GetActorViewHeight(tid) + (random(minZpos, maxZpos) << 16);
+		
+		// Determine the z-height of the ceiling.
+		fixed ceilingZ = GetSectorCeilingZ(0, spotX >> 16, spotY >> 16) - 2.0;
+		
+		int spotId = UniqueTID();
+		
+		// If the weather must spawn outside or inside, spawn a mapspot and check if the final position.
+		if (outside || inside)
+		{
+			SpawnForced("MapSpot", spotX, spotY, ceilingZ, spotId, 0);
+			bool actorIsOutside = CheckActorCeilingTexture(spotId, "F_SKY1");
+			
+			// If outside and it should not, or inside and it should not, remove the spot.
+			if ((actorIsOutside && !outside) || (!actorIsOutside && !inside))
+			{
+				Thing_Remove(spotId);
+				continue;
+			}
+			
+			// If the ceiling is closer use the ceiling's z positioning instead to prevent it from not spawning.
+			if (spotZ > ceilingZ) {
+				spotZ = ceilingZ;
+			}
+		}
+		
+		//LogDebug(StrParam(d:weatherIndex, s:" - ", s:WeatherString(type), s:" - ", f:spotX, s:" - ", f:spotY, s:" - ", f:spotZ, s:" - ", s:_weatherStrings[type]));
+		
+		// Spawn the weathertype at this position.
+		SpawnForced(_weatherStrings[type], spotX, spotY, spotZ, 0, 0);
+		Thing_Remove(spotId);
+	}
+}

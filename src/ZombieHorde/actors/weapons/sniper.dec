@@ -10,7 +10,7 @@ actor IsZoomed : Boolean {}
 // This is also used to indicate that the sniper is zoomed between reloads
 actor SniperZoomlevel : inventory { inventory.MaxAmount 2 }
 
-actor SniperSpawn : ZHweaponSpawn 8001
+actor ZHSniperSpawn : ZHweaponSpawn 8001
 {
 	inventory.PickupMessage "Sniper rifle"
 	tag "Sniper rifle"
@@ -25,12 +25,12 @@ actor SniperSpawn : ZHweaponSpawn 8001
 			TNT1 A 0 A_JumpIf(CallACS("CheckTeamIsHuman", 0, 0, 0) == true, "PickupSuccess")
 			stop
 		PickupSuccess:
-			TNT1 A 0 A_GiveInventory("SniperRifle", 1)
+			TNT1 A 0 A_GiveInventory("ZHSniperRifle", 1)
 			stop
 	}
 }
 
-actor SniperRifle : ZHWeapon
+actor ZHSniperRifle : ZHWeapon
 {
 	tag "Sniper rifle"
 	weapon.SlotNumber 5

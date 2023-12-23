@@ -22,7 +22,7 @@ function str FormatTics (int time, bool decimals)
 
 	// Add leading zeroes if we display hours.
 	str minutes = hoursInt ?
-		AddLeadingZero(minutesInt, 2) :
+		LeftPad(StrParam(d:minutesInt), '0', 2) :
 		StrParam(d:minutesInt);
 		
 	if (!minutesInt && !hoursInt && decimals) {
@@ -33,7 +33,7 @@ function str FormatTics (int time, bool decimals)
 	}
 
 	// Seconds. Always add leading zeroes to seconds
-	str seconds = AddLeadingZero(secondsInt, 2);
+	str seconds = LeftPad(StrParam(d:secondsInt), '0', 2);
 
 	// Full time
 	str fullTime = StrParam(s:hours, s:minutes, s:seconds);

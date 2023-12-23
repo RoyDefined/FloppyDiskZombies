@@ -4,12 +4,14 @@ function void AssignPlayerTID(void)
 	Thing_ChangeTID(0, PlayerNumber() + gameContext.playerTidBase);
 }
 
+// @public
 function bool IsValidPlayerTID(int tid)
 {
 	int id = tid - gameContext.playerTidBase;
 	return id >= 0 && id < MAX_PLAYERS;
 }
 
+// @public
 function void SetBasePlayerTID(int tid)
 {
 	// Altering player TID must happen before the gamemode starts.
@@ -37,6 +39,7 @@ function void SetBasePlayerTID(int tid)
 	}
 }
 
+// @public
 function int GetPlayerTIDById(int id)
 {
 	if (id == -1) {
@@ -47,6 +50,7 @@ function int GetPlayerTIDById(int id)
 	return id + gameContext.playerTidBase;
 }
 
+// @public
 function int GetPlayerIDByTID(int tid)
 {
 	if (!IsValidPlayerTID(tid)) {
@@ -57,6 +61,7 @@ function int GetPlayerIDByTID(int tid)
 	return tid - gameContext.playerTidBase;
 }
 
+// @public
 function int GetPlayerTID(void)
 {
 	return GetPlayerTIDById(PlayerNumber());

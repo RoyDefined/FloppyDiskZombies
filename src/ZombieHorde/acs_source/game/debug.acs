@@ -2,16 +2,18 @@
 // This file will only contain relevant scripts and functions when the project is compiled with `dev` defined.
 #ifdef dev
 
+// @public
 function bool CanUseDebug(void)
 {
 	// Debug is allowed when in singleplayer, or when `sv_zh_debugfunctions` is enabled, or when `sv_cheats` is enabled..
 	if (IsMultiplayer() && !GetCvar("sv_zh_debugfunctions") && !GetCvar("sv_cheats")) {
-		LogMessageClient("This operation either requires: a singleplayer game, `sv_zh_debugfunctions` to be set to true or `sv_cheats` to be set to true.", PlayerNumber());
+		LogTo("This operation either requires: a singleplayer game, `sv_zh_debugfunctions` to be set to true or `sv_cheats` to be set to true.", PlayerNumber());
 		return false;
 	}
 	return true;
 }
 
+// @public
 script "Dbg_SetSelfHuman"(void) net
 {
 	if (!CanUseDebug()) {
@@ -22,6 +24,7 @@ script "Dbg_SetSelfHuman"(void) net
 	SetHuman(PlayerNumber());
 }
 
+// @public
 script "Dbg_SetSelfZombie"(void) net
 {
 	if (!CanUseDebug()) {
@@ -32,6 +35,7 @@ script "Dbg_SetSelfZombie"(void) net
 	SetZombie(PlayerNumber());
 }
 
+// @public
 script "Dbg_CureSelf"(void) net
 {
 	if (!CanUseDebug()) {
@@ -42,6 +46,7 @@ script "Dbg_CureSelf"(void) net
 	Cure(PlayerNumber());
 }
 
+// @public
 script "Dbg_InfectSelf"(void) net
 {
 	if (!CanUseDebug()) {
@@ -52,6 +57,7 @@ script "Dbg_InfectSelf"(void) net
 	Infect(PlayerNumber(), PlayerNumber());
 }
 
+// @public
 script "Dbg_AddCountdown"(void) net
 {
 	if (!CanUseDebug()) {
@@ -62,6 +68,7 @@ script "Dbg_AddCountdown"(void) net
 	AddCountdownTimer(10);
 }
 
+// @public
 script "Dbg_AddPlayTime"(void) net
 {
 	if (!CanUseDebug()) {
@@ -72,6 +79,7 @@ script "Dbg_AddPlayTime"(void) net
 	AddPlayingTimer(10);
 }
 
+// @public
 script "Dbg_AddEndTime"(void) net
 {
 	if (!CanUseDebug()) {
@@ -82,6 +90,7 @@ script "Dbg_AddEndTime"(void) net
 	AddEndingTimer(10);
 }
 
+// @public
 script "Dbg_PauseTimer"(void) net
 {
 	if (!CanUseDebug()) {
@@ -92,6 +101,7 @@ script "Dbg_PauseTimer"(void) net
 	PauseTimer();
 }
 
+// @public
 script "Dbg_ResumeTimer"(void) net
 {
 	if (!CanUseDebug()) {
@@ -102,6 +112,7 @@ script "Dbg_ResumeTimer"(void) net
 	ResumeTimer();
 }
 
+// @public
 script "Dbg_KillUnsafePlayers"(void) net
 {
 	if (!CanUseDebug()) {

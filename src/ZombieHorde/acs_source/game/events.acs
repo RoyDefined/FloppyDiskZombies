@@ -1,3 +1,43 @@
+// These cvars are set on map load to determine if they must be set manually.
+// When the map unloads, these cvars are unset to restore the original context.
+bool _shootThroughAlliesCvarEnabled;
+bool _clientSendFullButtonInfoCvarEnabled;
+bool _dontStopPlayerScriptsOnDisconnectCvarEnabled;
+
+script "OnOpen" open
+{
+	_shootThroughAlliesCvarEnabled = GetCvar("sv_shootthroughallies");
+	_clientSendFullButtonInfoCvarEnabled = GetCvar("compat_clientssendfullbuttoninfo");
+	_dontStopPlayerScriptsOnDisconnectCvarEnabled = GetCvar("compat_dont_stop_player_scripts_on_disconnect");
+	
+	if (!_shootThroughAlliesCvarEnabled) {
+		SetGameplaySetting("sv_shootthroughallies", true);
+	}
+	
+	if (!_clientSendFullButtonInfoCvarEnabled) {
+		SetGameplaySetting("compat_clientssendfullbuttoninfo", true);
+	}
+	
+	if (!_dontStopPlayerScriptsOnDisconnectCvarEnabled) {
+		SetGameplaySetting("compat_dont_stop_player_scripts_on_disconnect", true);
+	}
+}
+
+script "OnUnloading" unloading
+{
+	if (!_shootThroughAlliesCvarEnabled) {
+		SetGameplaySetting("sv_shootthroughallies", false);
+	}
+	
+	if (!_clientSendFullButtonInfoCvarEnabled) {
+		SetGameplaySetting("compat_clientssendfullbuttoninfo", false);
+	}
+	
+	if (!_dontStopPlayerScriptsOnDisconnectCvarEnabled) {
+		SetGameplaySetting("compat_dont_stop_player_scripts_on_disconnect", false);
+	}
+}
+
 script "OnEnter" enter
 {
 	AssignPlayerTID();
@@ -20,6 +60,10 @@ script "OnEnter" enter
 script "ClientOpen" open clientside
 {
 	ACS_NamedExecute("DrawMapInfo", 0);
+	
+	if (!ACS_NamedExecute("ClientsideLoop", 0)) {
+		LogError("Client player loop could not be started.");
+	}
 }
 
 script "OnDisconnect" (int id) disconnect
@@ -42,7 +86,7 @@ script "DrawMapInfo" (void) clientside
 	
 	SetHudSize(960, 600, TRUE);
 	SetFont("BigFont");
-	HudMessage(s:"\cgZombie Horde \cj- ", s:levelName; HUDMSG_TYPEON, 0, CR_UNTRANSLATED, mapInfoHorizontal, mapInfoVertical, 6.0, 0.05, 0.5);
+	HudMessage(s:"\cgZombie Horde Lite \cj- ", s:levelName; HUDMSG_TYPEON, 0, CR_UNTRANSLATED, mapInfoHorizontal, mapInfoVertical, 6.0, 0.05, 0.5);
 	
 	delay(35*2);
 	

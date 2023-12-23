@@ -2,11 +2,13 @@
 // When the map unloads, these cvars are unset to restore the original context.
 bool _shootThroughAlliesCvarEnabled;
 bool _clientSendFullButtonInfoCvarEnabled;
+bool _dontStopPlayerScriptsOnDisconnectCvarEnabled;
 
 script "OnOpen" open
 {
 	_shootThroughAlliesCvarEnabled = GetCvar("sv_shootthroughallies");
 	_clientSendFullButtonInfoCvarEnabled = GetCvar("compat_clientssendfullbuttoninfo");
+	_dontStopPlayerScriptsOnDisconnectCvarEnabled = GetCvar("compat_dont_stop_player_scripts_on_disconnect");
 	
 	if (!_shootThroughAlliesCvarEnabled) {
 		SetGameplaySetting("sv_shootthroughallies", true);
@@ -14,6 +16,10 @@ script "OnOpen" open
 	
 	if (!_clientSendFullButtonInfoCvarEnabled) {
 		SetGameplaySetting("compat_clientssendfullbuttoninfo", true);
+	}
+	
+	if (!_dontStopPlayerScriptsOnDisconnectCvarEnabled) {
+		SetGameplaySetting("compat_dont_stop_player_scripts_on_disconnect", true);
 	}
 }
 
@@ -25,6 +31,10 @@ script "OnUnloading" unloading
 	
 	if (!_clientSendFullButtonInfoCvarEnabled) {
 		SetGameplaySetting("compat_clientssendfullbuttoninfo", false);
+	}
+	
+	if (!_dontStopPlayerScriptsOnDisconnectCvarEnabled) {
+		SetGameplaySetting("compat_dont_stop_player_scripts_on_disconnect", false);
 	}
 }
 

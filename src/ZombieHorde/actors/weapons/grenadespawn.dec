@@ -1,0 +1,44 @@
+actor ZHGrenadeSpawner : ZHPlayerCountItemSpawner 28100
+{
+	//$Sprite "PGRNA0"
+	
+	Radius 10
+	Height 8
+	
+	Scale 0.6
+	
+	Tag "Grenade"
+	
+	States
+	{
+		Spawn.Rest:
+			TNT1 A 0 A_SpawnItem("ZHGrenadeSpawn")
+			stop
+	}
+}
+
+actor ZHGrenadeSpawn : ZHweaponSpawn
+{
+	Radius 10
+	Height 8
+	Scale 0.6
+	
+	Inventory.Amount 1
+	Inventory.MaxAmount 1
+	
+	inventory.PickupMessage "Fire grenade"
+	inventory.PickupSound	"decorate/world/item/GET"
+	Tag "Grenade"
+	
+	States
+	{
+		Spawn:
+			PGRN A -1
+			
+		Pickup:
+			TNT1 A 0 A_JumpIf(CallACS("CheckTeamIsHuman", 0, 0, 0) == true, 1)
+			stop
+			TNT1 A 0 A_GiveInventory("ZHFireGrenade", 1)
+			stop
+	}
+}

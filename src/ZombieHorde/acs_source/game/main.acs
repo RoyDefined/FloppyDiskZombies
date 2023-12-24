@@ -176,6 +176,7 @@ function bool CheckDefaults(void)
 
 // The purpose of this function is setting default values to the configurable
 // settings of the survival gamemode (timers, zombie health, etc.).
+// @public
 function void SetSurvivalDefaults(void)
 {
 	// Floppy Disk mod does not have an ending timer since it has its own ending.
@@ -193,6 +194,7 @@ function void SetSurvivalDefaults(void)
 
 // The purpose of this function is setting default values to the configurable
 // settings of the escape gamemode (timers, zombie health, etc.).
+// @public
 function void SetEscapeDefaults(void)
 {
 	// Escape maps do not have a play timer.
@@ -218,6 +220,7 @@ function void SetEscapeDefaults(void)
 	if (gameContext.secondaryZombieHealth == 0)	{ gameContext.secondaryZombieHealth = 2000; }
 }
 
+// @public
 function void StartMode(void)
 {
 	/* if (gameContext.mode == unset) {

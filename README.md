@@ -28,7 +28,9 @@ This is a list of prerequisites that must be met in order to properly work with 
 Make sure the following steps are taken:
 1. To support Zandronum functions, make sure the GDCC compiler replaces the following specials in `scripts\gdcc\lib\inc\ACS\zspecial.acs`
    - `int 145:Player_SetTeam(1)` -> `int 145:Player_SetTeam(1, 2)`
-2. Compile the project once.
+2. To support Zandronum functions, make sure the GDCC compiler contains the following specials in `scripts\gdcc\lib\inc\ACS\zspecial.acs`
+   - `int -155:SetGameplaySetting(2, str, int)`
+3. Compile the project once.
 
 
 ## Building and publishing

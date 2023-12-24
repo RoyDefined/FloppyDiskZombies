@@ -1,0 +1,149 @@
+#library "advtele"
+#nocompact
+
+#import "acsutils.acs"
+#import "log.acs"
+
+#include "zcommon.acs"
+
+/*
+ * The AdvancedTeleport function.
+ * The advanced teleport tries to teleport the sourceTID to the targetTID in one way or another.
+ * It ensures no telefrags happen and if there is no room, it will try to teleport you in the general area.
+ */
+
+
+#libdefine TELEPORTFOG 1
+#libdefine TELEPORTTRANSFERVEL 2
+#libdefine TELEPORTUSEANGLE 4
+
+// @public
+// @summary Teleports the activator of the script to the target TID specifies between `minTargetTID` and `maxTargetTID` (inclusive). Parameter `area` specifies the area to try and teleport the player in. This function guarantees teleportation to the given TIDs, though it does delay to avoid bad recursion.
+function void AdvancedTeleportBetween(int minTargetTID, int maxTargetTID, int area, int flags)
+{
+	int tidPack = PackShorts(minTargetTID, maxTargetTID);
+	if (!ACS_NamedExecuteAlways("ScriptAdvancedTeleportBetween", 0, tidPack, area, flags)) {
+		LogError("Failed to call ScriptAdvancedTeleportBetween in AdvancedTeleportBetween.");
+	}
+}
+
+script "ScriptAdvancedTeleportBetween"(int tidPack, int area, int flags)
+{
+	int minTargetTID = UnpackShort1(tidPack),
+		maxTargetTID = UnpackShort2(tidPack);
+	while(true)
+	{
+		int currentMin = minTargetTID;
+		while(currentMin <= maxTargetTID)
+		{
+			if (!TryAdvancedTeleport(ActivatorTID(), currentMin, 20, area, (int)flags))
+			{
+				currentMin++;
+				continue;
+			}
+
+			terminate;
+		}
+
+		delay(5);
+	}
+}
+
+// @public
+// @summary Teleports the activator of the script to the target TID. Parameter `area` specifies the area to try and teleport the player in. This function guarantees teleportation to the given TIDs, though it does delay to avoid bad recursion.
+function void AdvancedTeleport(int targetTid, int area, int flags)
+{
+	int tidPack = PackShorts(ActivatorTID(), targetTid);
+	if (!ACS_NamedExecuteAlways("ScriptAdvancedTeleport", 0, tidPack, area, flags)) {
+		LogError("Failed to call ScriptAdvancedTeleport in AdvancedTeleport.");
+	}
+}
+
+script "ScriptAdvancedTeleport"(int tidPack, int area, int flags)
+{
+	int sourceTid = UnpackShort1(tidPack),
+		targetTid = UnpackShort2(tidPack);
+	while(true)
+	{
+		if (!TryAdvancedTeleport(sourceTid, targetTid, 20, area, flags))
+		{
+			delay(5);
+			continue;
+		}
+		
+		break;
+	}
+}
+
+// @public
+// @summary Teleports the source TID to the targetTID or around it based on the `area` provided, without telefragging or getting stuck. `threshold` specifies the number of attempts before failing. Returns `true` if succeeded.
+function bool TryAdvancedTeleport(int sourceTID, int targetTID, int threshold, int area, int flags)
+{
+	if (sourceTID == 0)
+	{
+		sourceTID = ActivatorTID();
+	}
+	
+	bool fog = (flags & TELEPORTFOG) == TELEPORTFOG;
+	bool transferVelocity = (flags & TELEPORTTRANSFERVEL) == TELEPORTTRANSFERVEL;
+	bool useAngle = (flags & TELEPORTUSEANGLE) == TELEPORTUSEANGLE;
+	
+	LogDebug(StrParam(s:"Start advanced teleport sending ", d:sourceTID, s:" to ", d:targetTID, s:". Flags: ", d:flags, s:", fog: ", s:(fog ? "true" : "false"), s:", transfer velocity: ", s:(transferVelocity ? "true" : "false"), s:", use angle: ", s:(useAngle ? "true" : "false"), s:"."));
+	
+	if (!IsTIDUsed(targetTID)) {
+		LogWarning(StrParam(s:"AdvancedTeleport failed. The target TID is not used (", d:targetTID, s:")."));
+		return false;
+	}
+	
+	fixed baseActorX = GetActorX(targetTID),
+		  baseActorY = GetActorY(targetTID),
+		  baseActorZ = GetActorZ(targetTID);
+	
+	fixed actorX = baseActorX,
+		  actorY = baseActorY,
+		  actorZ = baseActorZ;
+		 
+	// For some reason `SetActorPosition` is unable to spawn fog properly with the TARGET pointer check.
+	// We will have to do with calling it manually.
+	if (fog)
+	{
+		SpawnForced("AdvancedTeleportFog", GetActorX(0), GetActorY(0), GetActorZ(0));
+	}
+	
+	while(threshold > 0)
+	{
+		LogDebug(StrParam(s:"Attempting. Threshold: ", d:threshold, s:", x: ", f:actorX, s:", y: ", f:actorY, s:", Z: ", f:actorZ, s:"."));
+		
+		if (!SetActorPosition(sourceTID, actorX, actorY, actorZ, false))
+		{
+			actorX = baseActorX + (Random(-area, area) << 16);
+			actorY = baseActorY + (Random(-area, area) << 16);
+			actorZ = baseActorZ + (Random(0, area) << 16);
+			threshold--;
+			continue;
+		}
+		
+		if (!transferVelocity)
+		{
+			SetActorVelocity(sourceTID, 0.0, 0.0, 0.0, false, false);
+		}
+		
+		if (useAngle)
+		{
+			SetActorAngle(sourceTID, GetActorAngle(targetTID));
+		}
+		
+		// For some reason `SetActorPosition` is unable to spawn fog properly with the TARGET pointer check.
+		// We will have to do with calling it manually.
+		if (fog)
+		{
+			SpawnForced("AdvancedTeleportFog", actorX, actorY, actorZ);
+		}
+		
+		LogDebug("Teleport finished.");
+		return true;
+	}
+	
+	LogDebug("Teleport failed.");
+	return false;
+}

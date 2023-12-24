@@ -1,0 +1,14 @@
+#nocompact
+
+#library "weather"
+
+// Dependencies
+#include "zcommon.acs"
+#import "acsutils.acs"
+#import "log.acs"
+
+// Included files.
+#include "weather/weather.acs"
+#include "weather/weatherloop.acs"
+#include "weather/loop.acs"
+#include "weather/sync.acs"

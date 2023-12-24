@@ -1,13 +1,23 @@
+// @public
 function bool PlayerTeamIsNone(int id)   { return gameContext.players[id].type == none; }
+// @public
 function bool PlayerTeamIsHuman(int id)  { return gameContext.players[id].type == human; }
+// @public
 function bool PlayerTeamIsZombie(int id) { return gameContext.players[id].type == zombie; }
+// @public
 function bool TeamIsNone(void)   		 { return PlayerTeamIsNone(PlayerNumber()); }
+// @public
 function bool TeamIsHuman(void)  		 { return PlayerTeamIsHuman(PlayerNumber()); }
+// @public
 function bool TeamIsZombie(void) 		 { return PlayerTeamIsZombie(PlayerNumber()); }
+// @public
 script "CheckTeamIsNone"(void)   		 { SetResultValue(TeamIsNone()); }
+// @public
 script "CheckTeamIsHuman"(void)  		 { SetResultValue(TeamIsHuman()); }
+// @public
 script "CheckTeamIsZombie"(void) 		 { SetResultValue(TeamIsZombie()); }
 
+// @public
 script "CheckTargetTeamIsNone"(void)
 {
 	if (!SetActivatorToTarget(0))
@@ -19,6 +29,7 @@ script "CheckTargetTeamIsNone"(void)
 	SetResultValue(TeamIsNone());
 }
 
+// @public
 script "CheckTargetTeamIsHuman"(void)
 {
 	if (!SetActivatorToTarget(0))
@@ -30,6 +41,7 @@ script "CheckTargetTeamIsHuman"(void)
 	SetResultValue(TeamIsHuman());
 }
 
+// @public
 script "CheckTargetTeamIsZombie"(void)
 {
 	if (!SetActivatorToTarget(0))
@@ -42,6 +54,7 @@ script "CheckTargetTeamIsZombie"(void)
 }
 
 
+// @public
 function void LogMessageToHumans(str message)
 {
 	for (int i = 0; i < MAX_PLAYERS; ++i)
@@ -50,10 +63,11 @@ function void LogMessageToHumans(str message)
 			continue;
 		}
 		
-		LogMessageClient(message, i);
+		LogTo(message, i);
 	}
 }
 
+// @public
 function void LogMessageToZombies(str message)
 {
 	for (int i = 0; i < MAX_PLAYERS; ++i)
@@ -62,10 +76,11 @@ function void LogMessageToZombies(str message)
 			continue;
 		}
 		
-		LogMessageClient(message, i);
+		LogTo(message, i);
 	}
 }
 
+// @public
 function int HumanCount(void)
 {
 	int count;
@@ -81,6 +96,7 @@ function int HumanCount(void)
 	return count;
 }
 
+// @public
 function int ZombieCount(void)
 {
 	int count;
@@ -96,10 +112,14 @@ function int ZombieCount(void)
 	return count;
 }
 
+// A script variant of `PlayerCount()` for decorate use.
+script "ScriptPlayerCount"(void) { SetResultValue(PlayerCount()); }
+
 function void GiveHumanWeapons(void)
 {
-	GiveInventory("HuntingShotgun", 1);
-	GiveInventory("SniperRifle", 1);
+	GiveInventory("ZHHuntingShotgun", 1);
+	GiveInventory("ZHSniperRifle", 1);
+	GiveInventory("ZHChaingun", 1);
 }
 
 // Fully reset settings on the activator
@@ -121,6 +141,7 @@ function void ResetSettings(void)
 	TakeInventory("SniperZoomlevel", 2);
 }
 
+// @public
 function void SetInitialZombieHealth(int health)
 {
 	if (GameStateIsPlaying() || GameStateIsEnding())
@@ -138,6 +159,7 @@ function void SetInitialZombieHealth(int health)
 	gameContext.initialZombieHealth = health;
 }
 
+// @public
 function void SetSecondaryZombieHealth(int health)
 {
 	if (GameStateIsPlaying() || GameStateIsEnding())
@@ -179,14 +201,8 @@ function void SetHuman(int id)
 		LogError(StrParam(s:"Failed to morph ", s:PlayerName(id), s:" into a human (class = ", s:class, s:")."));
 		terminate;
 	}
-	
-#ifdef dev
-	bool noBroadcastTeamChange = false;
-#else
-	bool noBroadcastTeamChange = true;
-#endif
 
-	if (!Player_SetTeam(TEAM_BLUE, noBroadcastTeamChange)) {
+	if (!Player_SetTeam(TEAM_BLUE, true)) {
 		LogError(StrParam(s:"Failed to set team of ", s:PlayerName(id), s:" into blue."));
 		terminate;
 	}
@@ -222,13 +238,7 @@ function void SetZombie(int id)
 		terminate;
 	}	
 	
-#ifdef dev
-	bool noBroadcastTeamChange = false;
-#else
-	bool noBroadcastTeamChange = true;
-#endif
-	
-	if (!Player_SetTeam(TEAM_RED, noBroadcastTeamChange)) {
+	if (!Player_SetTeam(TEAM_RED, true)) {
 		LogError(StrParam(s:"Failed to set team of ", s:PlayerName(id), s:" into red."));
 		terminate;
 	}
@@ -250,7 +260,7 @@ function void Cure(int curedId)
 	
 	// TODO: Verify the human is properly cured. Maybe health must be set.
 	str curedName = PlayerName(curedId);
-	LogMessage(StrParam(s:"\cf", s:curedName, s:"\cj has miraculously been cured!"));
+	LogBold(StrParam(s:"\cf", s:curedName, s:"\cj has miraculously been cured!"));
 	SetHuman(curedId);
 }
 
@@ -263,7 +273,7 @@ function void Infect(int infector, int infected)
 	
 	str infectedName = PlayerName(infected);
 	str infectorName = PlayerName(infector);
-	LogMessage(StrParam(s:"\cf", s:infectedName, s:"\cj has been infected by \cf", s:infectorName, s:"\cj!"));
+	LogBold(StrParam(s:"\cf", s:infectedName, s:"\cj has been infected by \cf", s:infectorName, s:"\cj!"));
 	SetZombie(infected);
 	
 	if(!SetActivatorToPlayer(infected)) {
@@ -283,6 +293,10 @@ function void Infect(int infector, int infected)
 	if (!NamedExecuteClientScript("ZombieScratch", PlayerNumber())) {
 		LogError(StrParam(s:"Zombie scratch effect failed for ", s:PlayerName(PlayerNumber()), s:"."));
 	}
+	
+	if (!NamedExecuteClientScript("ScriptClientZombieDrawInfectionFire", infected)) {
+		LogError(StrParam(s:"Could not call ScriptClientZombieDrawInfectionFire for ", s:infectedName, s:" (", d:infected, s:")."));
+	}
 }
 
 function void RemovePlayer(int id)
@@ -299,7 +313,7 @@ function void SelectInitials(void)
 	int zombiesChosen;
 	while (zombiesChosen < zombieChooseCount)
 	{
-		int id = RandomIngamePlayerId();
+		int id = PickRandomPlayer();
 		if (PlayerTeamIsZombie(id)) {
 			continue;
 		}
@@ -354,6 +368,31 @@ function void SelectInitials(void)
 	LogDebug(StrParam(s:message, s:zombieChooseCount > 1 ? " have " : " has ", s:"been chosen as the initial zombie", s:zombieChooseCount > 1 ? "s." : "."));
 }
 
+// This function adds time depending on the number of zombies infected.
+function void AddInfectionTimerTime(void)
+{
+	static int infectedCount;
+	
+	// Check if the gamestate is playing.
+	// This should only happen offline unless people somehow manage to infect eachother outside the main play time.
+	if (!GameStateIsPlaying()) {
+		return;
+	}
+	
+	// Check if there are even humans left to continue the game.
+	if (HumanCount() == 0) {
+		return;
+	}
+	
+	// Added time starts at 90, and with each concurrent infect is 15 seconds less.
+	// When 10 or below, it will remain at 10 for the remaining concurrent infects.
+	int time = Max(0, 90 - 15 * infectedCount) + 10 * Clamp(infectedCount / 6, 0, 1);
+	infectedCount++;
+	
+	LogDebug(StrParam(s:"Adding ", d:time, s:" to the timer."));
+	AddPlayingTimerVisual(35 * time);
+}
+
 script "ZombieMeleeHit"(void)
 {
 	int infectedTID = GetActorProperty(0, APROP_TRACERTID);
@@ -364,7 +403,7 @@ script "ZombieMeleeHit"(void)
 	}
 	
 	if (!SetActivatorToTarget(0)) {
-		LogError("Failed to find target during melee hit.");
+		//LogError("Failed to find target during melee hit.");
 		terminate;
 	}
 	
@@ -384,7 +423,7 @@ script "ZombieMeleeHit"(void)
 	}
 	
 	if (!gameContext.playTimerDisabled) {
-		AddPlayingTimer(35 * 30);
+		AddInfectionTimerTime();
 	}
 	
 	//str infectedName = PlayerName(infectedId);
@@ -403,6 +442,16 @@ script "BurnActivator"(void)
 	{
 		if (Timer() % 4 == 0) {
 			if (!SpawnForced("BurningEffect", GetActorX(0), GetActorY(0), GetActorZ(0))) {
+				LogWarning(StrParam(s:"Failed to spawn burning effect for ", s:PlayerName(PlayerNumber()), s:"."));
+			}
+		}
+		
+		if (Timer() % 2 == 0)
+		{
+			fixed x = GetActorX(0) + (Random(-15, 15) << 16),
+			  y = GetActorY(0) + (Random(-15, 15) << 16),
+			  z = GetActorZ(0) + GetActorViewHeight(ActivatorTID()) * (0.1 * (Random(0, 9) << 16));
+			if (!SpawnForced("BurningEffect", x, y, z)) {
 				LogWarning(StrParam(s:"Failed to spawn burning effect for ", s:PlayerName(PlayerNumber()), s:"."));
 			}
 		}

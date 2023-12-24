@@ -1,6 +1,7 @@
 fire1 fire1
 
 POWERSTP	POWERSTP
+NUKE NUKE
 
 train train
 $ambient 10 train point continuous 0.3

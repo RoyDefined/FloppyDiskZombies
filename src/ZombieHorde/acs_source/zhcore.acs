@@ -1,0 +1,26 @@
+#library "zhcore"
+#nocompact
+
+#import "acsutils.acs"
+#import "log.acs"
+
+#include "zcommon.acs"
+
+#include "utils/key.acs"
+#include "utils/wordiscolored.acs"
+#include "utils/formattics.acs"
+
+#include "common/common.acs"
+#include "common/hud-ids.acs"
+
+#include "game/state.acs"
+#include "game/timer.acs"
+#include "game/identity.acs"
+#include "game/player.acs"
+#include "game/team.acs"
+#include "game/map.acs"
+#include "game/resist.acs"
+#include "game/main.acs"
+#include "game/weapons.acs"
+#include "game/events.acs"
+#include "game/debug.acs"

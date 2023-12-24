@@ -1,0 +1,20 @@
+actor ZHPlayerCountItemSpawner
+{
+	//$Category "Zombie Horde/Items"
+	//$NotAngled
+	
+	//$Arg0 Required player count
+	//$Arg0Tooltip Specify the minimum number of players for this item to spawn. Specify 0 for no minimum.
+	//$Arg0Type 0
+	//$Arg0Default 0
+	
+	States
+	{
+		Spawn:
+			TNT1 A 0 NoDelay A_JumpIf(args[0] == 0, "Spawn.Rest")
+			TNT1 A 1 A_JumpIf(CallACS("ScriptGameStateIsPlaying") == true, 1)
+			Loop
+			TNT1 A 5 A_JumpIf(CallACS("ScriptPlayerCount") >= args[0], "Spawn.Rest")
+			Stop
+	}
+}

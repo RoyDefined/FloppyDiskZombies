@@ -1,4 +1,4 @@
-
+// @public
 function void SetTimer(GameState state, int time)
 {
 	if (state < countdown && state > ending) {
@@ -24,6 +24,7 @@ function void SetTimer(GameState state, int time)
 	//LogDebug(StrParam(s:"Time for game state '", s:gameStateString, s:"' has changed to ", d:time, s:"."));
 }
 
+// @public
 function int GetTimer(GameState state)
 {
 	if (state < countdown && state > ending) {
@@ -36,19 +37,57 @@ function int GetTimer(GameState state)
 	return gameContext.endingTime;
 }
 
+// @public
 function void AddTimer(GameState state, int time)
 {
 	SetTimer(state, GetTimer(state) + time);
 }
 
+// Increases the play timer with a visual indicator.
+function void AddPlayingTimerVisual(int time)
+{
+	if (!GameStateIsPlaying() || gameContext.playTimerDisabled)
+	{
+		LogError("Unable to add visual indication to play timer increment. Timer is disabled or not shown.");
+		AddPlayingTimer(time);
+		return;
+	}
+	
+	SetHudSize(480, 360, false);
+			
+	str formattedTime = FormatTics(time - 1, false);
+	fixed x = 240.0 + FixedMul(5.0, Random(-10.0, 10.0));
+	fixed y = 332.0 + FixedMul(5.0, Random(-10.0, 0.0));
+	
+	HudMessageBold(s:StrParam(s:"+", s:formattedTime); HUDMSG_FADEOUT, 0, CR_GREEN, x, y, 1.0, 1.0);
+	AddPlayingTimer(time);
+}
+
+// @public
 function void SetCountdownTimer(int time) { SetTimer(countdown, time); }
+
+// @public
 function void SetPlayingTimer(int time)   { SetTimer(playing, time); }
+
+// @public
 function void SetEndingTimer(int time)    { SetTimer(ending, time); }
+
+// @public
 function int GetCountdownTimer(void)	  { return GetTimer(countdown); }
+
+// @public
 function int GetPlayingTimer(void)		  { return GetTimer(playing); }
+
+// @public
 function int GetEndingTimer(void)		  { return GetTimer(ending); }
+
+// @public
 function void AddCountdownTimer(int time) { AddTimer(countdown, time); }
+
+// @public
 function void AddPlayingTimer(int time)	  { AddTimer(playing, time); }
+
+// @public
 function void AddEndingTimer(int time)	  { AddTimer(ending, time); }
 
 function void DrawTime(void)
@@ -87,7 +126,7 @@ function void DrawTime(void)
 		str sound = timeSecond == 0 ? "timer/end" : "timer/one";
 		AmbientSound(sound, 100);
 		
-		HudMessageBold(s:"0:", s:AddLeadingZero(timeSecond, 2); HUDMSG_FADEOUT, HUDID_BOTTOM - 1, CR_RED, 240.0, 340.0, 0.1, 0.5);
+		HudMessageBold(s:"0:", s:LeftPad(StrParam(d:timeSecond), '0', 2); HUDMSG_FADEOUT, HUDID_BOTTOM - 1, CR_RED, 240.0, 340.0, 0.1, 0.5);
 	}
 	else
 	{
@@ -98,6 +137,7 @@ function void DrawTime(void)
 // Pauses the timer. Note that this will effectively pause the timer but still show it.
 // This works for every game state.
 // If the timer should be fully omitted/returned for a specific mode, then use `(Disable|Enable)(Play|End)Timer` below.
+// @public
 function void PauseTimer(void)
 {
 	gameContext.timerPaused = true;
@@ -107,6 +147,7 @@ function void PauseTimer(void)
 // Resumes the timer. Note that this will effectively resume a paused timer.
 // This works for every game state.
 // If the timer should be fully omitted/returned for a specific mode, then use `(Disable|Enable)(Play|End)Timer` below.
+// @public
 function void ResumeTimer(void)
 {
 	// Failsafe check to ensure the timer does not resume after the final timer has ended.
@@ -119,21 +160,25 @@ function void ResumeTimer(void)
 	LogDebug("Timer has been resumed.");
 }
 
+// @public
 function void DisablePlayTimer(void)
 {
 	gameContext.playTimerDisabled = true;
 }
 
+// @public
 function void EnablePlayTimer(void)
 {
 	gameContext.playTimerDisabled = false;
 }
 
+// @public
 function void DisableEndTimer(void)
 {
 	gameContext.endTimerDisabled = true;
 }
 
+// @public
 function void EnableEndTimer(void)
 {
 	gameContext.endTimerDisabled = false;

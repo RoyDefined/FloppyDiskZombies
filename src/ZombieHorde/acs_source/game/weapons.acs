@@ -1,8 +1,20 @@
-/*
 function void WeaponTick(void)
 {
+	TakeChaingunHeat();
 }
-*/
+	
+function void TakeChaingunHeat(void)
+{
+	if (Timer() % 2 != 0) {
+		return;
+	}
+	
+	if (StrIEquals(GetWeapon(), "ZHChaingun") && WeaponFiring()) {
+		return;
+	}
+	
+	TakeInventory("Chaingunheat", 1);
+}
 
 // General weapon functions.
 function void WeaponTickClient(void) clientside
@@ -48,9 +60,9 @@ script "WeaponLoop" (void)
 			continue;
 		}
 		
-		/*
 		WeaponTick();
 		
+		/*
 		if (TeamIsHuman()) {
 			WeaponHumanTick();
 		}
@@ -133,4 +145,16 @@ script "ZombieScratch" (void) clientside
 		HudMessage(s:"a"; HUDMSG_FADEOUT, HUDID_SCRATCH, CR_UNTRANSLATED, randomX, randomY, 0.1, 1.5);
 		delay(1);
 	}
+}
+
+script "ScriptSetWeaponFiring" (int firing)
+{
+	// If firing is above 0, set it to 1. Otherwise 0.
+	SetInventory("WeaponStateFiring", firing > 0 ? 1 : 0);
+}
+
+// Returns `true` is the weapon is being fired.
+function bool WeaponFiring(void)
+{
+	return CheckInventory("WeaponStateFiring") > 0;
 }

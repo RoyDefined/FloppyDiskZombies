@@ -1,3 +1,4 @@
+// @public
 function void SetInitialZombieSpawnId(int id)
 {
 	if (GameStateIsPlaying() || GameStateIsEnding())
@@ -15,6 +16,7 @@ function void SetInitialZombieSpawnId(int id)
 	gameContext.initialZombieSpawnId = id;
 }
 
+// @public
 function void SetPlayerSafe(int id, bool safe)
 {
 	if (!PlayerInGame(id))
@@ -26,27 +28,32 @@ function void SetPlayerSafe(int id, bool safe)
 	gameContext.players[id].safe = safe;
 	LogDebug(StrParam(s:PlayerName(id), s:" (", d:id, s:") ", s:safe ? "entered" : "left", s:" the safe zone."));
 }
+// @public
 
 function void SetSafe(bool safe)
 {
 	SetPlayerSafe(PlayerNumber(), safe);
 }
 
+// @public
 script "ScriptSetSafe"(void)
 {
 	SetPlayerSafe(PlayerNumber(), LineSide() == LINE_FRONT);
 }
 
+// @public
 function bool IsPlayerSafe(int id)
 {
 	return gameContext.players[id].safe;
 }
 
+// @public
 function bool IsSafe(void)
 {
 	return IsPlayerSafe(PlayerNumber());
 }
 
+// @public
 function void KillAllZombies(void)
 {
 	SetActivator(-1);
@@ -67,6 +74,7 @@ function void KillAllZombies(void)
 	}
 }
 
+// @public
 function void KillAllHumans(void)
 {
 	SetActivator(-1);
@@ -87,6 +95,7 @@ function void KillAllHumans(void)
 	}
 }
 
+// @public
 function void KillUnsafeZombies(void)
 {
 	SetActivator(-1);
@@ -107,6 +116,7 @@ function void KillUnsafeZombies(void)
 	}
 }
 
+// @public
 function void KillUnsafeHumans(void)
 {
 	SetActivator(-1);
@@ -127,6 +137,7 @@ function void KillUnsafeHumans(void)
 	}
 }
 
+// @public
 function void KillUnsafePlayers(void)
 {
 	SetActivator(-1);

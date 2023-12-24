@@ -57,6 +57,7 @@ struct Game
 #define gameContext (gameContextArray[0])
 Game gameContextArray[1];
 
+// @public
 function bool IsPlaying(void)
 {
 	return gameContext.state != none;

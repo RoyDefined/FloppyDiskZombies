@@ -43,10 +43,12 @@ function void SpawnWeather(int weatherIndex, int tid)
 		fixed angle = random(0.0, 1.0),
 			radius = (random(minRadius, maxRadius) << 16);
 		
+		fixed sourceZ = GetActorZ(tid) + GetActorViewHeight(tid);
+		
 		// Determine the position to spawn the weather particle at
 		fixed spotX = GetActorX(tid) + FixedMul(cos(angle), radius),
 			  spotY	= GetActorY(tid) + FixedMul(sin(angle), radius),
-			  spotZ	= GetActorZ(tid) + GetActorViewHeight(tid) + (random(minZpos, maxZpos) << 16);
+			  spotZ	= sourceZ + (random(minZpos, maxZpos) << 16);
 		
 		// Determine the z-height of the ceiling.
 		fixed ceilingZ = GetSectorCeilingZ(0, spotX >> 16, spotY >> 16) - 2.0;
@@ -56,7 +58,7 @@ function void SpawnWeather(int weatherIndex, int tid)
 		// If the weather must spawn outside or inside, spawn a mapspot and check if the final position.
 		if (outside || inside)
 		{
-			SpawnForced("MapSpot", spotX, spotY, ceilingZ, spotId, 0);
+			SpawnForced("MapSpot", spotX, spotY, sourceZ, spotId, 0);
 			bool actorIsOutside = CheckActorCeilingTexture(spotId, "F_SKY1");
 			
 			// If outside and it should not, or inside and it should not, remove the spot.

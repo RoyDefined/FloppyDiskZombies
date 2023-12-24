@@ -387,7 +387,10 @@ function void AddInfectionTimerTime(void)
 	// Added time starts at 90, and with each concurrent infect is 15 seconds less.
 	// When 10 or below, it will remain at 10 for the remaining concurrent infects.
 	int time = Max(0, 90 - 15 * infectedCount) + 10 * Clamp(infectedCount / 6, 0, 1);
-	AddPlayingTimer(35 * time);
+	infectedCount++;
+	
+	LogDebug(StrParam(s:"Adding ", d:time, s:" to the timer."));
+	AddPlayingTimerVisual(35 * time);
 }
 
 script "ZombieMeleeHit"(void)
@@ -420,7 +423,7 @@ script "ZombieMeleeHit"(void)
 	}
 	
 	if (!gameContext.playTimerDisabled) {
-		AddPlayingTimer(35 * 30);
+		AddInfectionTimerTime();
 	}
 	
 	//str infectedName = PlayerName(infectedId);

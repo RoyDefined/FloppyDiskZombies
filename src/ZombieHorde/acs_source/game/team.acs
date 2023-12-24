@@ -390,7 +390,7 @@ function void AddInfectionTimerTime(void)
 	infectedCount++;
 	
 	LogDebug(StrParam(s:"Adding ", d:time, s:" to the timer."));
-	AddPlayingTimer(35 * time);
+	AddPlayingTimerVisual(35 * time);
 }
 
 script "ZombieMeleeHit"(void)

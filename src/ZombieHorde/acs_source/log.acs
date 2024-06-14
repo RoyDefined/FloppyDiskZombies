@@ -29,6 +29,8 @@ enum LogSeverityT {
 	severityNone,
 };
 
+// Returns `true` if the game should show debug messages.
+// Will return `false` when playing online or when server cvar `sv_fdm_showdebugmessages` is disabled.
 function bool ShouldShowDebugMessages(void)
 {
 	return !IsNetworkGame() || GetCvar(SERVERSHOWDEBUGMESSAGESCVAR);
@@ -79,10 +81,9 @@ function void LogSeverity(str message, LogSeverityT severity)
 	// The reason is because NamedSendNetworkString will send the string to the server rather than staying on the client.
 	if (IsClient())
 	{
-		int activator = PlayerNumber();
-		SetActivatorToPlayer(ConsolePlayerNumber());
-		LogClient(formatted);
-		SetActivatorToPlayer(activator);
+		if (!ACS_NamedExecuteAlways("Log_ClientString", 0, formatted)) {
+			Log(s:"\cgError\cj: Failed to invoke Log_ClientString");
+		}
 		return;
 	}
 	
@@ -115,14 +116,13 @@ function void LogTo(str message, int clientId)
 	// The reason is because NamedSendNetworkString will send the string to the server rather than staying on the client.
 	if (IsClient())
 	{
-		int activator = PlayerNumber();
-		SetActivatorToPlayer(ConsolePlayerNumber());
-		LogClient(message);
-		SetActivatorToPlayer(activator);
+		if (!ACS_NamedExecuteAlways("Log_ClientString", 0, message)) {
+			Log(s:"\cgError\cj: Failed to invoke Log_ClientString");
+		}
 		return;
 	}
 	
-	if(!NamedSendNetworkString("Log_Client", message, clientId)) {
+	if(!NamedSendNetworkString("Log_ClientInt", message, clientId)) {
 		PrintBold(s:"\cgError\cj: A log message could not be delivered to client ", d:clientId, s:".");
 	}
 }
@@ -162,7 +162,7 @@ function void LogBold(str message)
 		Log(s:message);
 	}
 	
-	if(!NamedSendNetworkString("Log_Client", message)) {
+	if(!NamedSendNetworkString("Log_ClientInt", message)) {
 		PrintBold(s:"\cgError\cj: A log message could not be delivered to clients.");
 	}
 }
@@ -195,11 +195,17 @@ function void LogError(str message)
 	LogSeverity(message, severityError);
 }
 
-script "Log_Client" (int stringInt) clientside
+script "Log_ClientInt" (int stringInt) clientside
 {
 	str string = (str)stringInt;
 	SetActivatorToPlayer(ConsolePlayerNumber());
 	LogClient(string);
+}
+
+script "Log_ClientString" (int stringStr) clientside
+{
+	SetActivatorToPlayer(ConsolePlayerNumber());
+	LogClient(stringStr);
 }
 
 function void LogClient(str message)

@@ -87,7 +87,7 @@ function void LogSeverity(str message, LogSeverityT severity)
 		return;
 	}
 	
-	if(!NamedSendNetworkString("Log_Client", formatted)) {
+	if(!NamedSendNetworkString("Log_ClientInt", formatted)) {
 		PrintBold(s:"\cgError\cj: A log message with severity could not be delivered to clients.");
 	}
 }
